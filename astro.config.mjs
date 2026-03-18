@@ -5,7 +5,7 @@ import mdx from '@astrojs/mdx';
 // import sitemap from '@astrojs/sitemap'; // ← commentato temporaneamente
 
 export default defineConfig({
-  site: 'https://jovial-trifle-e7b055.netlify.app',
+  site: 'https://jovial-trifle-e7b055.netlify.app', // il tuo URL Netlify
   output: 'static',
   vite: {
     plugins: [tailwindcss()],
