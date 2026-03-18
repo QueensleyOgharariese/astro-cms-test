@@ -1,0 +1,211 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', ({ data }) => !data.draft);
+  return posts.map(post => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+const catLabels: Record<string, string> = {
+  manhwa: 'Manhwa', manga: 'Manga', anime: 'Anime', style: 'Style'
+};
+
+function formatDate(d: Date) {
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function renderStars(rating: number) {
+  const full = Math.floor(rating / 2);
+  const half = rating % 2 >= 1 ? 1 : 0;
+  const empty = 5 - full - half;
+  return '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(empty);
+}
+---
+<Base title={post.data.title} description={post.data.description}>
+
+<article>
+  <!-- Post hero -->
+  <div class="post-hero">
+    <div class="ph-inner">
+      <div class="ph-cat">
+        {catLabels[post.data.category]}
+        {post.data.spoilers && <span class="ph-spoiler">⚠ Contains Spoilers</span>}
+      </div>
+      <h1 class="ph-title">{post.data.title}</h1>
+      <div class="ph-meta">
+        <span>{formatDate(post.data.pubDate)}</span>
+        {post.data.rating && <span>· {post.data.rating}/10</span>}
+        {post.data.tags.length > 0 && <span>· {post.data.tags.slice(0,3).join(', ')}</span>}
+      </div>
+    </div>
+    <div class="ph-lead"></div>
+  </div>
+
+  <!-- Rating box -->
+  {post.data.rating && (
+    <div class="rating-section">
+      <div class="rating-box">
+        <div class="rating-score">{post.data.rating}</div>
+        <div>
+          <div class="rating-label">My rating</div>
+          <div class="rating-stars">{renderStars(post.data.rating)}</div>
+        </div>
+      </div>
+    </div>
+  )}
+
+  <!-- Body -->
+  <div class="prose post-bg">
+    <Content />
+  </div>
+
+  <!-- Tags -->
+  {post.data.tags.length > 0 && (
+    <div class="post-tags-wrap post-bg">
+      <div class="post-tags-inner">
+        {post.data.tags.map(tag => (
+          <a class="tag-pill" href={`/tags/${tag}`}>#{tag}</a>
+        ))}
+      </div>
+    </div>
+  )}
+
+  <!-- Nav back -->
+  <div class="post-back post-bg">
+    <div class="post-back-inner">
+      <a class="back-link" href="/">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M13 8H3M7 4l-4 4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back to blog
+      </a>
+      <a class="back-logo" href="/">Little Confidants</a>
+    </div>
+  </div>
+</article>
+
+</Base>
+
+<style>
+/* Post page uses light background */
+article { background: #f8f0fc; min-height: 100vh; }
+
+.post-hero {
+  background: linear-gradient(162deg, #08021a, #180628, #100420);
+  padding: 76px 52px 60px; position: relative; overflow: hidden;
+}
+.post-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 22% 62%, rgba(224,0,154,.25) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 20%, rgba(240,200,74,.1) 0%, transparent 50%);
+}
+.ph-lead {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--mg), var(--mg2), var(--mg), var(--gold), transparent);
+}
+.ph-inner {
+  position: relative; z-index: 2; max-width: 800px; margin: 0 auto; text-align: center;
+}
+.ph-cat {
+  font-family: var(--font-heading); font-size: .46rem; letter-spacing: .3em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 15px;
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+}
+.ph-cat::before, .ph-cat::after { content: '—'; opacity: .4; color: var(--mg); }
+.ph-spoiler {
+  background: rgba(224,0,154,.2); border: 1px solid rgba(224,0,154,.4);
+  padding: 2px 8px; font-size: .38rem; letter-spacing: .15em; color: var(--mg3);
+}
+.ph-title {
+  font-family: var(--font-display); font-size: clamp(1.9rem, 4.6vw, 3.5rem);
+  font-weight: 300; font-style: italic; color: var(--mg5); line-height: 1.14;
+  margin-bottom: 18px;
+}
+.ph-meta {
+  display: flex; gap: 18px; justify-content: center; flex-wrap: wrap;
+  font-family: var(--font-heading); font-size: .4rem; letter-spacing: .12em;
+  color: rgba(255,160,232,.36);
+}
+
+.rating-section { background: #f8f0fc; padding: 0 40px; max-width: 760px; margin: 0 auto; }
+.rating-box {
+  border: 1px solid rgba(224,0,154,.14); border-left: 3px solid var(--mg);
+  padding: 18px 22px; margin: 28px 0 0; display: flex; align-items: center;
+  gap: 18px; background: rgba(224,0,154,.03);
+}
+.rating-score {
+  font-family: var(--font-display); font-size: 2.5rem; font-weight: 300;
+  font-style: italic; color: var(--mg); line-height: 1;
+}
+.rating-label {
+  font-family: var(--font-heading); font-size: .4rem; letter-spacing: .12em;
+  text-transform: uppercase; color: rgba(224,0,154,.4); margin-bottom: 4px;
+}
+.rating-stars { font-size: 1rem; letter-spacing: 3px; color: var(--gold); }
+
+.post-bg { background: #f8f0fc; }
+
+.prose {
+  max-width: 720px; margin: 0 auto; padding: 40px 40px 60px;
+}
+.prose :global(p) {
+  font-family: var(--font-body); font-size: 1.08rem; line-height: 1.95;
+  color: #14062a; margin-bottom: 1.55rem;
+}
+.prose :global(p:first-of-type::first-letter) {
+  font-family: var(--font-display); font-size: 4rem; font-weight: 600;
+  font-style: italic; float: left; line-height: .78; margin: 8px 10px 0 0;
+  color: var(--mg);
+}
+.prose :global(h2) {
+  font-family: var(--font-display); font-size: 1.7rem; font-weight: 300;
+  font-style: italic; color: #14062a; margin: 2.4rem 0 1rem;
+  border-left: 3px solid var(--mg); padding-left: 14px;
+}
+.prose :global(h3) {
+  font-family: var(--font-display); font-size: 1.3rem; font-weight: 400;
+  font-style: italic; color: #1e0a2e; margin: 1.8rem 0 .8rem;
+}
+.prose :global(blockquote) {
+  border-left: 2px solid var(--mg); padding: 11px 20px; margin: 22px 0;
+  background: rgba(224,0,154,.04); font-style: italic; font-size: 1.02rem; color: #2e0a42;
+}
+.prose :global(ul), .prose :global(ol) {
+  padding-left: 1.4rem; margin-bottom: 1.4rem; color: #14062a;
+}
+.prose :global(li) { font-size: 1.05rem; line-height: 1.8; margin-bottom: .4rem; }
+.prose :global(a) { color: var(--mg); border-bottom: 1px solid rgba(224,0,154,.3); text-decoration: none; }
+.prose :global(a:hover) { color: var(--mg2); }
+.prose :global(img) { width: 100%; border-radius: 4px; margin: 1.5rem 0; }
+
+.post-tags-wrap { padding: 0 40px; max-width: 760px; margin: 0 auto; }
+.post-tags-inner {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  padding: 20px 0 28px;
+  border-top: 1px solid rgba(224,0,154,.1);
+}
+
+.post-back { border-top: 1px solid rgba(224,0,154,.08); padding: 20px 40px 52px; }
+.post-back-inner { max-width: 720px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+.back-link {
+  font-family: var(--font-heading); font-size: .46rem; letter-spacing: .15em;
+  text-transform: uppercase; color: var(--mg); cursor: pointer; transition: color .2s;
+  display: flex; align-items: center; gap: 8px; text-decoration: none;
+}
+.back-link:hover { color: var(--mg2); }
+.back-logo {
+  font-family: var(--font-display); font-size: .8rem; font-style: italic;
+  color: rgba(224,0,154,.22); letter-spacing: .08em; text-decoration: none;
+}
+
+@media (max-width: 700px) {
+  .post-hero { padding: 60px 24px 48px; }
+  .prose { padding: 32px 20px 48px; }
+  .post-tags-wrap, .post-back, .rating-section { padding-left: 20px; padding-right: 20px; }
+}
+</style>

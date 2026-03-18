@@ -1,0 +1,73 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('posts', ({ data }) => !data.draft);
+const tagMap = new Map<string, number>();
+posts.forEach(post => {
+  post.data.tags.forEach(tag => {
+    tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
+  });
+});
+const tags = [...tagMap.entries()].sort((a, b) => b[1] - a[1]);
+---
+<Base title="All Tags">
+
+<div class="tags-page">
+  <div class="tags-header">
+    <div class="tags-header-bg"></div>
+    <div class="tags-header-inner">
+      <div class="tags-breadcrumb"><a href="/">Home</a><span>·</span><span>Tags</span></div>
+      <h1 class="tags-title">All Tags</h1>
+      <p class="tags-sub">{tags.length} tags across {posts.length} posts</p>
+    </div>
+    <div class="tags-lead"></div>
+  </div>
+
+  <div class="tags-body">
+    {tags.length === 0 ? (
+      <p class="tags-empty">No tags yet.</p>
+    ) : (
+      <div class="tags-cloud">
+        {tags.map(([tag, count]) => (
+          <a class="tag-big" href={`/tags/${tag}`}>
+            <span class="tag-name">#{tag}</span>
+            <span class="tag-ct">{count}</span>
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</div>
+
+</Base>
+
+<style>
+.tags-page { background: var(--dark2); min-height: 100vh; }
+.tags-header { background: linear-gradient(162deg, #080214, #16062a, #0e0420); padding: 64px 52px 52px; position: relative; overflow: hidden; }
+.tags-header-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at 40% 60%, rgba(224,0,154,.18) 0%, transparent 55%); }
+.tags-lead { position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, transparent, var(--gold), var(--mg), var(--mg2), var(--mg), var(--gold), transparent); }
+.tags-header-inner { position: relative; z-index: 2; max-width: 900px; margin: 0 auto; }
+.tags-breadcrumb { font-family: var(--font-heading); font-size: .42rem; letter-spacing: .2em; text-transform: uppercase; color: rgba(224,0,154,.4); margin-bottom: 16px; display: flex; gap: 8px; }
+.tags-breadcrumb a { color: rgba(224,0,154,.4); text-decoration: none; transition: color .2s; }
+.tags-breadcrumb a:hover { color: var(--mg3); }
+.tags-title { font-family: var(--font-display); font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 300; font-style: italic; color: var(--mg5); margin-bottom: 10px; }
+.tags-sub { font-family: var(--font-heading); font-size: .5rem; letter-spacing: .22em; text-transform: uppercase; color: rgba(224,0,154,.4); }
+.tags-body { max-width: 1000px; margin: 0 auto; padding: 52px; }
+.tags-cloud { display: flex; flex-wrap: wrap; gap: 12px; }
+.tag-big {
+  display: inline-flex; align-items: center; gap: 10px;
+  border: 1px solid rgba(224,0,154,.22); padding: 10px 18px;
+  cursor: pointer; transition: all .22s; text-decoration: none;
+  background: rgba(224,0,154,.05);
+}
+.tag-big:hover { background: rgba(224,0,154,.15); border-color: var(--mg2); transform: translateY(-2px); }
+.tag-name { font-family: var(--font-heading); font-size: .48rem; letter-spacing: .14em; text-transform: uppercase; color: var(--mg3); }
+.tag-ct { font-family: var(--font-display); font-size: .85rem; font-style: italic; color: rgba(224,0,154,.4); }
+.tags-empty { font-family: var(--font-display); font-style: italic; color: rgba(255,160,232,.4); text-align: center; padding: 80px 0; }
+
+@media (max-width: 700px) {
+  .tags-header { padding: 48px 24px 40px; }
+  .tags-body { padding: 32px 24px; }
+}
+</style>

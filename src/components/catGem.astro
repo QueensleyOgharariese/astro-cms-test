@@ -1,0 +1,28 @@
+---
+interface Props { cat: string; label: string; }
+const { cat, label } = Astro.props;
+const gems: Record<string,{c:string;c2:string;v:string}> = {
+  manhwa: {c:'#e8006a',c2:'#ff88cc',v:'var(--mg)'},
+  manga:  {c:'#c88800',c2:'#ffe080',v:'var(--gold)'},
+  anime:  {c:'#9020d0',c2:'#d080ff',v:'var(--v2)'},
+  style:  {c:'#009090',c2:'#60e8e8',v:'var(--t)'},
+  games:  {c:'#d03070',c2:'#ff80b0',v:'var(--mg2)'},
+};
+const g = gems[cat] ?? gems.manhwa;
+---
+<span class="cg-wrap">
+  <svg class="cg-svg" viewBox="0 0 32 16" fill="none" aria-hidden="true">
+    <path d="M8 1 L24 1 L31 8 L24 15 L8 15 L1 8 Z" fill={g.c} fill-opacity=".25" stroke={g.c} stroke-width="1.2"/>
+    <path d="M10 3 L22 3 L27 8 L22 13 L10 13 L5 8 Z" fill={g.c2} fill-opacity=".1" stroke={g.c2} stroke-width=".6" stroke-opacity=".35"/>
+    <path d="M10 3 L22 3 L19 7 L13 7 Z" fill="rgba(255,255,255,.22)"/>
+    <circle cx="16" cy="8" r="1.6" fill="rgba(255,255,255,.72)"/>
+    <circle cx="12.5" cy="5.5" r=".9" fill="rgba(255,255,255,.4)"/>
+  </svg>
+  <span class="cg-lbl" style={`color:${g.v}`}>{label}</span>
+</span>
+<style>
+.cg-wrap{display:inline-flex;align-items:center;gap:6px;margin-bottom:8px}
+.cg-svg{width:28px;height:14px;flex-shrink:0;filter:drop-shadow(0 0 3px currentColor);transition:filter .25s}
+.cg-wrap:hover .cg-svg{filter:drop-shadow(0 0 7px currentColor) drop-shadow(0 0 12px currentColor)}
+.cg-lbl{font-family:var(--font-heading);font-size:.42rem;letter-spacing:.18em;text-transform:uppercase}
+</style>

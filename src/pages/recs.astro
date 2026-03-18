@@ -1,0 +1,625 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const allRecs = await getCollection('recs');
+const sorted  = allRecs.sort((a,b) => b.data.rating - a.data.rating);
+const mustRead = sorted.filter(r => r.data.mustRead);
+const others   = sorted.filter(r => !r.data.mustRead);
+
+// Sample data so page is never empty
+const sampleMust = [
+  { title:'The Remarried Empress', creator:'Alphatart', type:'manhwa', rating:9.5, status:'completed', mustRead:true,
+    description:'A queen who refuses to be a victim. Political intrigue, gorgeous art, and an empress who is absolutely iconic.',
+    tags:['royalty','strong-heroine','political','must-read'] },
+  { title:'A Fake Soulmate but a Real Marriage', creator:'Narak', type:'manhwa', rating:9.2, status:'ongoing', mustRead:true,
+    description:'Enemies-to-lovers done so right it physically hurts. The tension is immaculate.',
+    tags:['romance','enemies-to-lovers','slowburn'] },
+];
+const samplePicks = [
+  { title:'Frieren: Beyond Journey\'s End', creator:'Kanehito Yamada', type:'manga', rating:9.8, status:'ongoing',
+    description:'Grief, time and what it means to live slowly. The quietest manga that hits the hardest.',
+    tags:['fantasy','emotional','must-read'] },
+  { title:'I Became the Tyrant\'s Secretary', creator:'Mira', type:'manhwa', rating:8.8, status:'completed',
+    description:'The most chaotic office romance imaginable. Incredibly fun from start to finish.',
+    tags:['romance','comedy','historical'] },
+  { title:'Dungeon Meshi', creator:'Ryoko Kui', type:'manga', rating:9.6, status:'completed',
+    description:'A cooking + dungeon-crawling manga that becomes something profound. One of a kind.',
+    tags:['fantasy','cozy','adventure'] },
+  { title:'I Am the Villain', creator:'Siya', type:'manhwa', rating:8.5, status:'ongoing',
+    description:'The villainess trope at its absolute peak. Dark, clever, and surprisingly tender.',
+    tags:['villainess','fantasy','dark'] },
+  { title:'A Sign of Affection', creator:'Suu Morishita', type:'manga', rating:9.0, status:'completed',
+    description:'The softest, most sincere romance manga I\'ve read. It made me want to be kinder.',
+    tags:['romance','slice-of-life','wholesome'] },
+  { title:'Dark Coquette Aesthetics', creator:'Various', type:'style', rating:8.2, status:undefined,
+    description:'Gothic lolita meets dark feminine energy — the aesthetic moodboard I live in my head.',
+    tags:['fashion','dark','aesthetic'] },
+];
+
+const showMust  = mustRead.length  > 0 ? mustRead.map(r  => ({...r.data, slug: r.slug})) : sampleMust;
+const showPicks = others.length    > 0 ? others.map(r   => ({...r.data, slug: r.slug})) : samplePicks;
+
+const typeColor:  Record<string,string> = { manhwa:'var(--mg)', manga:'var(--gold)', style:'var(--t)', music:'var(--v2)' };
+const typeLabel:  Record<string,string> = { manhwa:'Manhwa', manga:'Manga', style:'Style', music:'Music' };
+const statusLabel:Record<string,string> = { completed:'Complete', ongoing:'Ongoing', hiatus:'On Hiatus' };
+
+function stars(r:number){ return '★'.repeat(Math.round(r/2))+'☆'.repeat(5-Math.round(r/2)); }
+---
+
+<Base title="Recommendations" description="Curated picks — manhwa, manga, style and more. Things I love and think you'll love too.">
+
+<!-- ══ HERO ══ -->
+<section id="recs-hero">
+  <div class="rh-bg"></div>
+  <div class="rh-vignette"></div>
+
+  <!-- Rose window -->
+  <svg class="rh-rose" viewBox="0 0 500 500" fill="none" aria-hidden="true">
+    <circle cx="250" cy="250" r="242" stroke="rgba(232,0,106,.5)"  stroke-width="2"/>
+    <circle cx="250" cy="250" r="194" stroke="rgba(232,0,106,.32)" stroke-width="1.2"/>
+    <circle cx="250" cy="250" r="140" stroke="rgba(140,0,180,.28)" stroke-width="1"/>
+    <circle cx="250" cy="250" r="84"  stroke="rgba(232,0,106,.4)"  stroke-width="1.2"/>
+    <circle cx="250" cy="250" r="38"  stroke="rgba(232,0,106,.48)" stroke-width="1.2"/>
+    <circle cx="250" cy="250" r="12"  fill="rgba(232,0,106,.35)"/>
+    <line x1="250" y1="8"   x2="250" y2="492" stroke="rgba(232,0,106,.22)" stroke-width=".7"/>
+    <line x1="8"   y1="250" x2="492" y2="250" stroke="rgba(232,0,106,.22)" stroke-width=".7"/>
+    <line x1="44"  y1="44"  x2="456" y2="456" stroke="rgba(240,200,74,.14)" stroke-width=".5"/>
+    <line x1="456" y1="44"  x2="44"  y2="456" stroke="rgba(240,200,74,.14)" stroke-width=".5"/>
+    <g opacity=".4">
+      {[0,45,90,135,180,225,270,315].map((deg,i)=>(
+        <ellipse cx="250" cy="62" rx="12" ry="20"
+          fill={i%3===0?'rgba(232,0,106,.28)':i%3===1?'rgba(240,200,74,.18)':'rgba(140,0,180,.22)'}
+          transform={`rotate(${deg} 250 250)`}/>
+      ))}
+    </g>
+  </svg>
+
+  <!-- Twin arches -->
+  <svg class="rh-arches" viewBox="0 0 560 480" fill="none" aria-hidden="true">
+    <!-- Left arch -->
+    <path d="M10 480 L10 180 Q140 30 270 180 L270 480" stroke="rgba(232,0,106,.35)" stroke-width="1.8" fill="none"/>
+    <path d="M22 480 L22 188 Q140 48 258 188 L258 480" stroke="rgba(240,200,74,.18)" stroke-width=".7" fill="none" stroke-dasharray="4 7"/>
+    <!-- Left trefoil -->
+    <circle cx="140" cy="135" r="28" fill="rgba(232,0,106,.14)" stroke="rgba(240,200,74,.38)" stroke-width="1"/>
+    <circle cx="100" cy="162" r="20" fill="rgba(140,0,180,.1)"  stroke="rgba(240,200,74,.26)" stroke-width=".8"/>
+    <circle cx="180" cy="162" r="20" fill="rgba(232,0,106,.12)" stroke="rgba(240,200,74,.26)" stroke-width=".8"/>
+    <path d="M140 148 C140 148 133 143 133 138 C133 135 135.5 133.5 138 133.5 C139.5 133.5 140 135.5 140 135.5 C140 135.5 140.5 133.5 142 133.5 C144.5 133.5 147 135 147 138 C147 143 140 148 140 148Z" fill="rgba(232,0,106,.82)"/>
+    <!-- Right arch (mirrored) -->
+    <path d="M550 480 L550 180 Q420 30 290 180 L290 480" stroke="rgba(140,0,180,.35)" stroke-width="1.8" fill="none"/>
+    <path d="M538 480 L538 188 Q420 48 302 188 L302 480" stroke="rgba(240,200,74,.18)" stroke-width=".7" fill="none" stroke-dasharray="4 7"/>
+    <circle cx="420" cy="135" r="28" fill="rgba(140,0,180,.14)" stroke="rgba(240,200,74,.38)" stroke-width="1"/>
+    <circle cx="380" cy="162" r="20" fill="rgba(232,0,106,.1)"  stroke="rgba(240,200,74,.26)" stroke-width=".8"/>
+    <circle cx="460" cy="162" r="20" fill="rgba(140,0,180,.12)" stroke="rgba(240,200,74,.26)" stroke-width=".8"/>
+    <circle cx="420" cy="135" r="11" fill="rgba(200,140,255,.18)"/>
+  </svg>
+
+  <!-- Lead lines -->
+  <div class="rh-lh" style="top:24%"></div>
+  <div class="rh-lh" style="bottom:28%"></div>
+
+  <div class="rh-inner">
+    <!-- Wand ornament (small, centered) -->
+    <div class="rh-ornament" aria-hidden="true">
+      <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+        <path d="M22 2 L24.5 10 L32 7 L29 15 L37 17 L30.5 21.5 L34 30 L26 27 L25 35 L22 27 L19 35 L18 27 L10 30 L13.5 21.5 L7 17 L15 15 L12 7 L19.5 10 Z"
+          fill="rgba(255,222,240,.85)" stroke="rgba(232,0,106,.5)" stroke-width="1"/>
+        <path d="M22 26.5 C22 26.5 15.5 22.5 15.5 18 C15.5 15.2 17.5 13.5 20 13.5 C21.2 13.5 22 15 22 15 C22 15 22.8 13.5 24 13.5 C26.5 13.5 28.5 15.2 28.5 18 C28.5 22.5 22 26.5 22 26.5Z"
+          fill="rgba(232,0,106,.88)"/>
+        <circle cx="22" cy="22" r="3" fill="rgba(255,255,255,.55)"/>
+      </svg>
+    </div>
+    <div class="rh-eyebrow"><div class="rhe-l"></div>personal picks<div class="rhe-r"></div></div>
+    <h1 class="rh-title">Recommendations</h1>
+    <p class="rh-sub">Things I love and think you'll love too.</p>
+
+    <!-- Category quick links -->
+    <div class="rh-cats">
+      <a class="rh-cat rh-cat-1" href="#recs-must">✦ Must Reads</a>
+      <a class="rh-cat rh-cat-2" href="#recs-picks">♡ All Picks</a>
+    </div>
+  </div>
+
+  <!-- Bottom lead bar -->
+  <div class="rh-lead-bot"></div>
+</section>
+
+<!-- ══ FLOATING DECORATIVE ELEMENTS ══ -->
+<!-- Small wand left -->
+<div class="fd-left" aria-hidden="true">
+  <svg viewBox="0 0 70 220" fill="none" width="70">
+    <defs>
+      <linearGradient id="rc-shaft" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#ffe8f8"/>
+        <stop offset="20%"  stop-color="#ff78c8"/>
+        <stop offset="55%"  stop-color="#e8006a"/>
+        <stop offset="100%" stop-color="#300050"/>
+      </linearGradient>
+      <linearGradient id="rc-gold" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#fff2a0"/>
+        <stop offset="100%" stop-color="#c88800"/>
+      </linearGradient>
+      <filter id="rc-gf" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="2" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <!-- Star glow -->
+    <path d="M35 4 L37.5 13 L46 10 L43 18 L52 20 L45.5 25 L49 34 L41 31 L40 40 L35 32 L30 40 L29 31 L21 34 L24.5 25 L18 20 L27 18 L24 10 L32.5 13 Z"
+      fill="rgba(255,215,240,.28)" filter="url(#rc-gf)"/>
+    <path d="M35 6.5 L37 14 L45 11.5 L42.5 18.5 L50.5 20.5 L44.5 25 L47.5 33 L40.5 30.5 L39.5 38 L35 31 L30.5 38 L29.5 30.5 L22.5 33 L25.5 25 L19.5 20.5 L27.5 18.5 L25 11.5 L33 14 Z"
+      fill="rgba(255,218,238,.88)" stroke="rgba(232,0,106,.5)" stroke-width=".9"/>
+    <!-- Heart -->
+    <path d="M35 34 C35 34 27 29 27 23 C27 19.5 29.5 17.5 32 17.5 C33.5 17.5 35 19.5 35 19.5 C35 19.5 36.5 17.5 38 17.5 C40.5 17.5 43 19.5 43 23 C43 29 35 34 35 34Z"
+      fill="rgba(232,0,106,.9)" filter="url(#rc-gf)"/>
+    <path d="M29.5 20 C29 21.5 28.8 23 29.5 25" stroke="rgba(255,255,255,.55)" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="35" y1="2"  x2="35" y2="8"  stroke="rgba(255,248,255,.88)" stroke-width="1.6" stroke-linecap="round"/>
+    <line x1="52" y1="8"  x2="47" y2="12" stroke="rgba(255,248,255,.62)" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="18" y1="8"  x2="23" y2="12" stroke="rgba(255,248,255,.62)" stroke-width="1.2" stroke-linecap="round"/>
+    <!-- Collar -->
+    <ellipse cx="35" cy="47" rx="11" ry="4" fill="rgba(240,200,74,.62)" stroke="rgba(255,235,130,.65)" stroke-width=".9"/>
+    <circle  cx="35" cy="47" r="2.5" fill="url(#rc-gold)"/>
+    <circle  cx="25" cy="47" r="1.8" fill="rgba(232,0,106,.8)"/>
+    <circle  cx="45" cy="47" r="1.8" fill="rgba(232,0,106,.8)"/>
+    <!-- Shaft -->
+    <rect x="30.5" y="50" width="9" height="128" rx="4.5" fill="url(#rc-shaft)"/>
+    <rect x="32"   y="52" width="2.5" height="124" rx="1.2" fill="rgba(255,220,248,.15)"/>
+    <!-- Bands -->
+    <rect x="29" y="75" width="12" height="5.5" rx="2.8" fill="rgba(240,200,74,.62)"/><circle cx="35" cy="77.5" r="2" fill="url(#rc-gold)"/>
+    <rect x="29" y="106" width="12" height="5.5" rx="2.8" fill="rgba(232,0,106,.58)"/><circle cx="35" cy="108.5" r="2" fill="rgba(255,100,195,1)"/>
+    <rect x="29" y="137" width="12" height="5.5" rx="2.8" fill="rgba(160,0,200,.52)"/><circle cx="35" cy="139.5" r="2" fill="rgba(190,80,255,1)"/>
+    <!-- Wings -->
+    <path d="M30.5 158 Q18 153 7 155 Q2 158 5 163 Q14 168 28 163 Z" fill="rgba(255,185,225,.65)" stroke="rgba(240,200,74,.5)" stroke-width=".8"/>
+    <path d="M39.5 158 Q52 153 63 155 Q68 158 65 163 Q56 168 42 163 Z" fill="rgba(255,185,225,.65)" stroke="rgba(240,200,74,.5)" stroke-width=".8"/>
+    <ellipse cx="10" cy="159" rx="5" ry="3" fill="rgba(232,0,106,.48)"/>
+    <ellipse cx="60" cy="159" rx="5" ry="3" fill="rgba(232,0,106,.48)"/>
+    <circle cx="3"  cy="159" r="2.8" fill="url(#rc-gold)"/>
+    <circle cx="67" cy="159" r="2.8" fill="url(#rc-gold)"/>
+    <circle cx="35" cy="159" r="5.5" fill="url(#rc-gold)" stroke="rgba(255,248,160,.55)" stroke-width="1"/>
+    <circle cx="35" cy="159" r="2.5" fill="rgba(255,255,255,.85)"/>
+    <circle cx="35" cy="159" r="1.2" fill="rgba(232,0,106,.9)"/>
+    <!-- Handle + pommel -->
+    <path d="M30.5 166 Q28 186 29 200 Q31.5 210 35 210 Q38.5 210 40 200 Q41 186 39.5 166 Z" fill="url(#rc-shaft)" stroke="rgba(240,200,74,.4)" stroke-width=".8"/>
+    <ellipse cx="35" cy="211" rx="8.5" ry="6" fill="url(#rc-gold)" stroke="rgba(255,242,160,.6)" stroke-width="1"/>
+    <ellipse cx="35" cy="211" rx="5"   ry="3.5" fill="rgba(255,220,235,.52)"/>
+    <circle  cx="35" cy="211" r="2"   fill="rgba(232,0,106,.88)"/>
+    <!-- Sparks -->
+    <circle class="rc-spark" cx="35" cy="8" r="2.8" fill="rgba(255,248,255,1)"  style="--d:1.5s;--dl:0s;--tx:-12px;--ty:-16px;--tx2:-22px;--ty2:-34px"/>
+    <circle class="rc-spark" cx="35" cy="8" r="2"   fill="rgba(240,200,74,.98)" style="--d:1.2s;--dl:.3s;--tx:11px;--ty:-12px;--tx2:20px;--ty2:-26px"/>
+    <circle class="rc-spark" cx="35" cy="8" r="2.5" fill="rgba(200,150,255,.95)" style="--d:1.8s;--dl:.6s;--tx:6px;--ty:-20px;--tx2:10px;--ty2:-38px"/>
+    <circle class="rc-spark" cx="35" cy="8" r="1.8" fill="rgba(232,0,106,.98)"  style="--d:2s;--dl:.15s;--tx:9px;--ty:-16px;--tx2:16px;--ty2:-32px"/>
+  </svg>
+  <div class="fd-sym" style="--x:44px;--y:40px;--d:2.5s;--dl:0s">✦</div>
+  <div class="fd-sym" style="--x:-4px;--y:100px;--d:2.1s;--dl:.7s">♡</div>
+  <div class="fd-sym" style="--x:46px;--y:160px;--d:2.8s;--dl:1.3s">✧</div>
+</div>
+
+<!-- Small phone right -->
+<div class="fd-right" aria-hidden="true">
+  <svg viewBox="0 0 120 230" fill="none" width="120">
+    <defs>
+      <linearGradient id="rcp-bt" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%"   stop-color="#ffddef"/>
+        <stop offset="60%"  stop-color="#e8006a"/>
+        <stop offset="100%" stop-color="#800038"/>
+      </linearGradient>
+      <linearGradient id="rcp-bb" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#ffcce0"/>
+        <stop offset="100%" stop-color="#700030"/>
+      </linearGradient>
+      <linearGradient id="rcp-sc" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#0e0022"/>
+        <stop offset="100%" stop-color="#0a0018"/>
+      </linearGradient>
+      <linearGradient id="rcp-gl" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#fff5b0"/>
+        <stop offset="100%" stop-color="#906000"/>
+      </linearGradient>
+      <linearGradient id="rcp-ky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#ffd5eb"/>
+        <stop offset="100%" stop-color="#c8005a"/>
+      </linearGradient>
+      <filter id="rcp-gf" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="1.8" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="rcp-clip"><rect x="18" y="26" width="72" height="62" rx="5"/></clipPath>
+    </defs>
+    <!-- Antenna -->
+    <rect x="82" y="1" width="4" height="20" rx="2" fill="rgba(255,200,230,.8)"/>
+    <rect x="80" y="19" width="8" height="4"  rx="2" fill="url(#rcp-gl)"/>
+    <path d="M84 2 L85.2 6 L89.5 4.8 L87.5 8.5 L92 9.5 L88.5 12 L90.5 16 L86.5 14.5 L86 19 L84 15 L82 19 L81.5 14.5 L77.5 16 L79.5 12 L76 9.5 L80.5 8.5 L78.5 4.8 L82.8 6 Z"
+      fill="rgba(240,200,74,.9)" filter="url(#rcp-gf)"/>
+    <path d="M84 12 C84 12 82 11 82 9.5 C82 8.8 82.6 8.4 83.2 8.4 C83.7 8.4 84 9 84 9 C84 9 84.3 8.4 84.8 8.4 C85.4 8.4 86 8.8 86 9.5 C86 11 84 12 84 12Z" fill="rgba(232,0,106,.9)"/>
+    <!-- Top half -->
+    <rect x="6" y="20" width="96" height="82" rx="11" fill="url(#rcp-bt)" stroke="url(#rcp-gl)" stroke-width="1.5"/>
+    <rect x="6" y="20" width="96" height="82" rx="11" fill="none" stroke="rgba(255,255,255,.18)" stroke-width=".9"/>
+    <!-- Pearls -->
+    <circle cx="12" cy="36" r="2.2" fill="rgba(255,230,245,.82)" stroke="url(#rcp-gl)" stroke-width=".6"/>
+    <circle cx="12" cy="50" r="2.2" fill="rgba(255,230,245,.82)" stroke="url(#rcp-gl)" stroke-width=".6"/>
+    <circle cx="12" cy="64" r="2.2" fill="rgba(232,0,106,.7)"    stroke="url(#rcp-gl)" stroke-width=".6"/>
+    <circle cx="12" cy="78" r="2.2" fill="rgba(255,230,245,.82)" stroke="url(#rcp-gl)" stroke-width=".6"/>
+    <circle cx="96" cy="36" r="2.2" fill="rgba(255,230,245,.82)" stroke="url(#rcp-gl)" stroke-width=".6"/>
+    <circle cx="96" cy="50" r="2.2" fill="rgba(255,230,245,.82)" stroke="url(#rcp-gl)" stroke-width=".6"/>
+    <circle cx="96" cy="64" r="2.2" fill="rgba(232,0,106,.7)"    stroke="url(#rcp-gl)" stroke-width=".6"/>
+    <circle cx="96" cy="78" r="2.2" fill="rgba(255,230,245,.82)" stroke="url(#rcp-gl)" stroke-width=".6"/>
+    <!-- Screen -->
+    <rect x="16" y="26" width="76" height="70" rx="7" fill="rgba(4,0,12,.95)" stroke="url(#rcp-gl)" stroke-width="1.2"/>
+    <rect x="18" y="28" width="72" height="66" rx="6" fill="url(#rcp-sc)"/>
+    <!-- Status bar -->
+    <rect x="18" y="28" width="72" height="8" rx="3" fill="rgba(232,0,106,.1)" clip-path="url(#rcp-clip)"/>
+    <text x="23" y="34.5" font-family="monospace" font-size="4" fill="rgba(255,180,210,.68)" clip-path="url(#rcp-clip)">♡ MAGICAL ♡</text>
+    <!-- Heart on screen -->
+    <path d="M54 74 C54 74 40 66 40 57 C40 52.5 43.5 50 47 50 C49.5 50 54 54 54 54 C54 54 58.5 50 61 50 C64.5 50 68 52.5 68 57 C68 66 54 74 54 74Z"
+      fill="rgba(232,0,106,.8)" stroke="rgba(255,160,210,.5)" stroke-width=".9" filter="url(#rcp-gf)" clip-path="url(#rcp-clip)"/>
+    <path d="M42.5 53 C42 54.5 41.8 57 42.5 59" stroke="rgba(255,255,255,.52)" stroke-width="1.3" stroke-linecap="round" clip-path="url(#rcp-clip)"/>
+    <path d="M32 56 L33 59 L36.5 59.7 L33 60.4 L32 63.5 L31 60.4 L27.5 59.7 L31 59 Z" fill="rgba(240,200,74,.8)" clip-path="url(#rcp-clip)"/>
+    <path d="M76 56 L77 59 L80.5 59.7 L77 60.4 L76 63.5 L75 60.4 L71.5 59.7 L75 59 Z" fill="rgba(240,200,74,.8)" clip-path="url(#rcp-clip)"/>
+    <text x="54" y="82" text-anchor="middle" font-family="monospace" font-size="3.8" fill="rgba(255,200,230,.5)" clip-path="url(#rcp-clip)">little confidants</text>
+    <!-- Hinge -->
+    <rect x="6" y="98" width="96" height="10" rx="0" fill="url(#rcp-gl)"/>
+    <rect x="6" y="99" width="96" height="8" rx="0" fill="rgba(160,100,0,.38)"/>
+    <circle cx="22"  cy="103" r="3" fill="url(#rcp-gl)"/><circle cx="21.3" cy="102.3" r="1" fill="rgba(255,255,255,.65)"/>
+    <circle cx="60"  cy="103" r="3.8" fill="url(#rcp-gl)"/>
+    <path d="M60 106 C60 106 57.8 104.5 57.8 103 C57.8 102.2 58.4 101.7 59.1 101.7 C59.6 101.7 60 102.3 60 102.3 C60 102.3 60.4 101.7 60.9 101.7 C61.6 101.7 62.2 102.2 62.2 103 C62.2 104.5 60 106 60 106Z" fill="rgba(232,0,106,.9)"/>
+    <circle cx="98"  cy="103" r="3" fill="url(#rcp-gl)"/><circle cx="97.3" cy="102.3" r="1" fill="rgba(255,255,255,.65)"/>
+    <!-- Bottom half -->
+    <rect x="6" y="104" width="96" height="118" rx="11" fill="url(#rcp-bb)" stroke="url(#rcp-gl)" stroke-width="1.5"/>
+    <rect x="6" y="104" width="96" height="118" rx="11" fill="none" stroke="rgba(255,255,255,.12)" stroke-width=".9"/>
+    <!-- Side gems -->
+    <ellipse cx="11"  cy="152" rx="4" ry="7" fill="rgba(232,0,106,.52)" stroke="url(#rcp-gl)" stroke-width=".8"/>
+    <ellipse cx="11"  cy="152" rx="2" ry="4" fill="rgba(255,180,220,.62)"/>
+    <ellipse cx="101" cy="152" rx="4" ry="7" fill="rgba(232,0,106,.52)" stroke="url(#rcp-gl)" stroke-width=".8"/>
+    <ellipse cx="101" cy="152" rx="2" ry="4" fill="rgba(255,180,220,.62)"/>
+    <!-- D-pad small -->
+    <circle cx="60" cy="128" r="16" fill="rgba(12,0,28,.62)" stroke="url(#rcp-gl)" stroke-width="1.2"/>
+    <rect x="54.5" y="115" width="11" height="8"  rx="3.5" fill="url(#rcp-ky)"/><path d="M60 117.5 L57.5 121 L62.5 121 Z" fill="rgba(255,255,255,.75)"/>
+    <rect x="54.5" y="133" width="11" height="8"  rx="3.5" fill="url(#rcp-ky)"/><path d="M60 138.5 L57.5 135 L62.5 135 Z" fill="rgba(255,255,255,.75)"/>
+    <rect x="44"  y="122" width="8"  height="11" rx="3.5" fill="url(#rcp-ky)"/><path d="M46 127.5 L50 125 L50 130 Z" fill="rgba(255,255,255,.75)"/>
+    <rect x="68"  y="122" width="8"  height="11" rx="3.5" fill="url(#rcp-ky)"/><path d="M74 127.5 L70 125 L70 130 Z" fill="rgba(255,255,255,.75)"/>
+    <circle cx="60" cy="128" r="7.5" fill="rgba(232,0,106,.82)" stroke="rgba(255,160,210,.52)" stroke-width="1"/>
+    <path d="M60 132 C60 132 56.5 130 56.5 128 C56.5 126.8 57.5 126 58.5 126 C59.2 126 60 127.2 60 127.2 C60 127.2 60.8 126 61.5 126 C62.5 126 63.5 126.8 63.5 128 C63.5 130 60 132 60 132Z" fill="rgba(255,255,255,.88)"/>
+    <!-- Mini keypad 3x3 -->
+    {[...Array(9)].map((_,j)=>{
+      const col=j%3,row=Math.floor(j/3);
+      const x=24+col*24,y=152+row*18;
+      const labels=['1','2','3','4','5','6','7','8','9'];
+      return (<g>
+        <rect x={x} y={y} width="18" height="12" rx="5" fill="url(#rcp-ky)" stroke="rgba(255,200,230,.3)" stroke-width=".7"/>
+        <rect x={x+.7} y={y+.7} width="16.6" height="4" rx="2.8" fill="rgba(255,255,255,.15)"/>
+        <text x={x+9} y={y+9.5} text-anchor="middle" font-family="sans-serif" font-size="6.5" font-weight="600" fill="rgba(255,255,255,.9)">{labels[j]}</text>
+      </g>);
+    })}
+    <!-- Bottom row ♡ 0 ✦ -->
+    <rect x="24"  y="206" width="18" height="12" rx="5" fill="rgba(220,0,90,.62)" stroke="rgba(255,160,210,.35)" stroke-width=".7"/>
+    <path d="M33 214 C33 214 30.2 212.2 30.2 210.5 C30.2 209.5 31 209 32 209 C32.6 209 33 209.7 33 209.7 C33 209.7 33.4 209 34 209 C35 209 35.8 209.5 35.8 210.5 C35.8 212.2 33 214 33 214Z" fill="rgba(255,255,255,.85)"/>
+    <rect x="50"  y="206" width="18" height="12" rx="5" fill="url(#rcp-ky)"/>
+    <text x="59"  y="215" text-anchor="middle" font-family="sans-serif" font-size="6.5" font-weight="600" fill="rgba(255,255,255,.9)">0</text>
+    <rect x="76"  y="206" width="18" height="12" rx="5" fill="rgba(160,120,0,.52)" stroke="rgba(255,240,130,.35)" stroke-width=".7"/>
+    <path d="M85 208 L85.8 210.5 L88.5 211.2 L85.8 211.9 L85 214.5 L84.2 211.9 L81.5 211.2 L84.2 210.5 Z" fill="rgba(255,255,255,.85)"/>
+    <!-- Bottom jewels -->
+    <circle cx="42"  cy="220" r="3.2" fill="rgba(232,0,106,.62)" stroke="url(#rcp-gl)" stroke-width=".7"/>
+    <circle cx="60"  cy="222" r="4"   fill="url(#rcp-gl)"/><circle cx="59.5" cy="221.5" r="1.5" fill="rgba(255,255,255,.72)"/>
+    <circle cx="78"  cy="220" r="3.2" fill="rgba(232,0,106,.62)" stroke="url(#rcp-gl)" stroke-width=".7"/>
+  </svg>
+  <div class="fd-sym" style="--x:-14px;--y:35px;--d:2.3s;--dl:.4s">♡</div>
+  <div class="fd-sym" style="--x:68px;--y:90px;--d:2.7s;--dl:1s">✦</div>
+  <div class="fd-sym" style="--x:-10px;--y:155px;--d:2s;--dl:.7s">✧</div>
+</div>
+
+<!-- ══ MUST READS ══ -->
+<div class="section-lead"></div>
+<section id="recs-must" class="glass-section">
+  <div class="panel-content recs-inner">
+    <div class="sec-head">
+      <div class="sec-over"><div class="sec-rule"></div>essential<div class="sec-rule"></div></div>
+      <div class="sec-title">Must Reads</div>
+    </div>
+
+    <div class="must-grid">
+      {showMust.map((rec, i) => (
+        <div class={`must-card must-card-${(i%3)+1}`} style={`--ac:${typeColor[rec.type]??'var(--mg)'}`}>
+          <!-- Decorative top panel -->
+          <div class="mc-top-panel">
+            <svg viewBox="0 0 280 120" fill="none" width="100%" aria-hidden="true">
+              <path d="M0 120 L0 60 Q140 0 280 60 L280 120 Z" fill="rgba(232,0,106,.08)"/>
+              <path d="M0 120 L0 65 Q140 10 280 65 L280 120" fill="none" stroke="rgba(240,200,74,.35)" stroke-width="1.5"/>
+              <path d="M0 120 L0 70 Q140 18 280 70 L280 120" fill="none" stroke="rgba(232,0,106,.2)"  stroke-width=".8" stroke-dasharray="5 7"/>
+              <!-- Trefoil top center -->
+              <circle cx="140" cy="42" r="22" fill="rgba(232,0,106,.18)" stroke="rgba(240,200,74,.45)" stroke-width="1.2"/>
+              <circle cx="108" cy="60" r="16" fill="rgba(140,0,180,.12)" stroke="rgba(240,200,74,.28)" stroke-width=".9"/>
+              <circle cx="172" cy="60" r="16" fill="rgba(232,0,106,.14)" stroke="rgba(240,200,74,.28)" stroke-width=".9"/>
+              <!-- Heart in trefoil -->
+              <path d="M140 52 C140 52 133 47.5 133 43 C133 40.5 135 39 137.5 39 C139 39 140 41 140 41 C140 41 141 39 142.5 39 C145 39 147 40.5 147 43 C147 47.5 140 52 140 52Z" fill="rgba(255,255,255,.72)"/>
+              <path d="M140 50.5 C140 50.5 134 47 134 43 C134 41 135.5 40 137.5 40 C139 40 140 42 140 42 C140 42 141 40 142.5 40 C144.5 40 146 41 146 43 C146 47 140 50.5 140 50.5Z" fill="rgba(232,0,106,.88)"/>
+              <!-- Side diamonds -->
+              <polygon points="52,60 72,76 52,92 32,76" fill="rgba(240,200,74,.12)" stroke="rgba(240,200,74,.35)" stroke-width="1"/>
+              <polygon points="228,60 248,76 228,92 208,76" fill="rgba(240,200,74,.12)" stroke="rgba(240,200,74,.35)" stroke-width="1"/>
+              <!-- Lead line -->
+              <line x1="0" y1="92" x2="280" y2="92" stroke="rgba(240,200,74,.22)" stroke-width=".9"/>
+            </svg>
+          </div>
+
+          <div class="mc-body">
+            <div class="mc-badges">
+              <span class="mc-must-badge">✦ Must Read</span>
+              <span class="mc-type" style={`color:${typeColor[rec.type]??'var(--mg)'}`}>
+                {typeLabel[rec.type]??rec.type}
+                {rec.status && ` · ${statusLabel[rec.status]??rec.status}`}
+              </span>
+            </div>
+
+            <h2 class="mc-title">{rec.title}</h2>
+            <div class="mc-creator">by {rec.creator}</div>
+            <p class="mc-desc">{rec.description}</p>
+
+            <div class="mc-rating-row">
+              <span class="mc-score">{rec.rating}</span>
+              <div class="mc-stars-wrap">
+                <div class="mc-stars">{stars(rec.rating)}</div>
+                <div class="mc-score-label">/ 10</div>
+              </div>
+            </div>
+
+            <div class="mc-tags">
+              {rec.tags.slice(0,5).map((t:string) => (
+                <span class="rc-tag">#{t}</span>
+              ))}
+            </div>
+
+            <!-- Bottom ornament -->
+            <div class="mc-bottom-orn" aria-hidden="true">
+              <div class="mbo-line"></div>
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path d="M9 0 L10.5 6 L17 6 L11.8 9.8 L13.8 16 L9 12.2 L4.2 16 L6.2 9.8 L1 6 L7.5 6 Z" fill="rgba(240,200,74,.5)"/>
+              </svg>
+              <div class="mbo-line"></div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- ══ ALL PICKS ══ -->
+<div class="section-lead"></div>
+<section id="recs-picks" class="glass-section">
+  <div class="panel-content recs-inner">
+    <div class="sec-head">
+      <div class="sec-over"><div class="sec-rule"></div>also worth your time<div class="sec-rule"></div></div>
+      <div class="sec-title">More Picks</div>
+    </div>
+
+    <div class="picks-grid">
+      {showPicks.map((rec, i) => (
+        <div class="pick-card" style={`--ac:${typeColor[rec.type]??'var(--mg)'}; --delay:${i*0.04}s`}>
+          <div class="pc-accent-bar"></div>
+          <div class="pc-body">
+            <div class="pc-top">
+              <span class="pc-type" style={`color:${typeColor[rec.type]??'var(--mg)'}`}>
+                {typeLabel[rec.type]??rec.type}
+                {rec.status&&<span class="pc-status"> · {statusLabel[rec.status]??rec.status}</span>}
+              </span>
+              <span class="pc-score">{rec.rating}</span>
+            </div>
+
+            <h3 class="pc-title">{rec.title}</h3>
+            <div class="pc-creator">by {rec.creator}</div>
+            <p class="pc-desc">{rec.description}</p>
+
+            <div class="pc-footer">
+              <div class="pc-stars">{stars(rec.rating)}</div>
+              <div class="pc-tags">
+                {rec.tags.slice(0,3).map((t:string) => (
+                  <span class="rc-tag">#{t}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+          <!-- Corner diamond -->
+          <div class="pc-diamond" aria-hidden="true"></div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- ══ CLOSING NOTE ══ -->
+<div class="section-lead"></div>
+<section id="recs-note" class="glass-section">
+  <div class="panel-content recs-note-inner">
+    <!-- Stained glass panels flanking text -->
+    <div class="note-glass note-glass-l" aria-hidden="true">
+      <svg viewBox="0 0 120 180" fill="none" width="120">
+        <rect x="2" y="2" width="116" height="176" stroke="rgba(240,200,74,.38)" stroke-width="1.4" fill="none"/>
+        <path d="M2 60 Q60 2 118 60" fill="rgba(232,0,106,.1)" stroke="rgba(240,200,74,.4)" stroke-width="1.4"/>
+        <circle cx="60" cy="36" r="16" fill="rgba(232,0,106,.18)" stroke="rgba(240,200,74,.4)" stroke-width="1"/>
+        <circle cx="36" cy="50" r="12" fill="rgba(140,0,180,.12)" stroke="rgba(240,200,74,.28)" stroke-width=".9"/>
+        <circle cx="84" cy="50" r="12" fill="rgba(232,0,106,.14)" stroke="rgba(240,200,74,.28)" stroke-width=".9"/>
+        <path d="M60 44 C60 44 54 40 54 36 C54 33.5 56 32 58.5 32 C59.8 32 60 33.8 60 33.8 C60 33.8 60.2 32 61.5 32 C64 32 66 33.5 66 36 C66 40 60 44 60 44Z" fill="rgba(232,0,106,.85)"/>
+        <polygon points="60,62 80,78 60,94 40,78" fill="rgba(232,0,106,.13)" stroke="rgba(240,200,74,.35)" stroke-width="1"/>
+        <rect x="8"  y="60" width="40" height="32" fill="rgba(232,0,106,.07)" stroke="rgba(240,200,74,.22)" stroke-width=".8"/>
+        <rect x="72" y="60" width="40" height="32" fill="rgba(140,0,180,.07)" stroke="rgba(240,200,74,.22)" stroke-width=".8"/>
+        <rect x="8"  y="100" width="104" height="74" fill="rgba(240,200,74,.04)" stroke="rgba(240,200,74,.2)" stroke-width=".8"/>
+        <line x1="60" y1="60" x2="60" y2="178" stroke="rgba(240,200,74,.25)" stroke-width=".9"/>
+        <line x1="8"  y1="98" x2="112" y2="98"  stroke="rgba(240,200,74,.2)"  stroke-width=".8"/>
+      </svg>
+    </div>
+
+    <div class="note-body">
+      <div class="note-ornament" aria-hidden="true">
+        <svg width="52" height="20" viewBox="0 0 52 20" fill="none">
+          <line x1="0" y1="10" x2="18" y2="10" stroke="rgba(240,200,74,.42)" stroke-width="1"/>
+          <path d="M26 2 L28 9 L35 9 L29.5 13 L31.5 20 L26 16 L20.5 20 L22.5 13 L17 9 L24 9 Z" fill="rgba(240,200,74,.55)"/>
+          <line x1="34" y1="10" x2="52" y2="10" stroke="rgba(240,200,74,.42)" stroke-width="1"/>
+        </svg>
+      </div>
+      <blockquote class="note-quote">
+        "These are the stories that stayed with me — the ones I think about long after I've finished them. Every recommendation here is personal."
+      </blockquote>
+      <div class="note-sig">— Little Confidants</div>
+      <a class="note-cta" href="/blog">Read the full reviews →</a>
+    </div>
+
+    <div class="note-glass note-glass-r" aria-hidden="true">
+      <svg viewBox="0 0 120 180" fill="none" width="120">
+        <rect x="2" y="2" width="116" height="176" stroke="rgba(240,200,74,.38)" stroke-width="1.4" fill="none"/>
+        <path d="M2 60 Q60 2 118 60" fill="rgba(140,0,180,.1)" stroke="rgba(240,200,74,.4)" stroke-width="1.4"/>
+        <circle cx="60" cy="36" r="16" fill="rgba(140,0,180,.18)" stroke="rgba(240,200,74,.4)" stroke-width="1"/>
+        <circle cx="36" cy="50" r="12" fill="rgba(232,0,106,.12)" stroke="rgba(240,200,74,.28)" stroke-width=".9"/>
+        <circle cx="84" cy="50" r="12" fill="rgba(140,0,180,.14)" stroke="rgba(240,200,74,.28)" stroke-width=".9"/>
+        <circle cx="60" cy="36" r="7" fill="rgba(200,140,255,.22)"/>
+        <polygon points="60,62 80,78 60,94 40,78" fill="rgba(140,0,180,.13)" stroke="rgba(240,200,74,.35)" stroke-width="1"/>
+        <rect x="8"  y="60" width="40" height="32" fill="rgba(140,0,180,.07)" stroke="rgba(240,200,74,.22)" stroke-width=".8"/>
+        <rect x="72" y="60" width="40" height="32" fill="rgba(232,0,106,.07)" stroke="rgba(240,200,74,.22)" stroke-width=".8"/>
+        <rect x="8"  y="100" width="104" height="74" fill="rgba(232,0,106,.04)" stroke="rgba(240,200,74,.2)"  stroke-width=".8"/>
+        <line x1="60" y1="60" x2="60" y2="178" stroke="rgba(240,200,74,.25)" stroke-width=".9"/>
+        <line x1="8"  y1="98" x2="112" y2="98"  stroke="rgba(240,200,74,.2)"  stroke-width=".8"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+</Base>
+
+<style>
+/* ══ HERO ══ */
+#recs-hero{
+  min-height:62vh;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:90px 52px 60px;
+  background:linear-gradient(180deg,var(--dark) 0%,var(--dark2) 60%,var(--dark) 100%);
+}
+.rh-bg{position:absolute;inset:0;background:radial-gradient(ellipse 55% 55% at 50% 42%,rgba(232,0,106,.2) 0%,transparent 60%),radial-gradient(ellipse 30% 35% at 18% 18%,rgba(140,0,180,.1) 0%,transparent 55%),radial-gradient(ellipse 28% 32% at 82% 18%,rgba(240,200,74,.07) 0%,transparent 55%)}
+.rh-vignette{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,transparent 28%,rgba(0,0,0,.72) 100%);z-index:1}
+.rh-rose{position:absolute;z-index:2;top:50%;left:50%;transform:translate(-50%,-50%);width:min(72vmin,500px);height:min(72vmin,500px);pointer-events:none;animation:rbreath 6s ease-in-out infinite}
+@keyframes rbreath{0%,100%{opacity:.2}50%{opacity:.32}}
+.rh-arches{position:absolute;z-index:3;top:50%;left:50%;transform:translate(-50%,-50%);width:min(85vw,560px);height:auto;pointer-events:none}
+.rh-lh{position:absolute;left:0;right:0;height:2px;z-index:4;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(240,200,74,.28),rgba(232,0,106,.42),rgba(240,200,74,.28),transparent)}
+.rh-inner{position:relative;z-index:10;text-align:center;display:flex;flex-direction:column;align-items:center;gap:0}
+.rh-ornament{margin-bottom:18px;filter:drop-shadow(0 0 12px rgba(232,0,106,.58));animation:cpulse 3.5s ease-in-out infinite}
+@keyframes cpulse{0%,100%{filter:drop-shadow(0 0 12px rgba(232,0,106,.5))}50%{filter:drop-shadow(0 0 28px rgba(255,68,153,.85))}}
+.rh-eyebrow{font-family:var(--font-heading);font-size:.46rem;letter-spacing:.52em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:12px;opacity:0;animation:fadeup .7s ease .1s forwards}
+.rhe-l{height:1px;width:38px;background:linear-gradient(90deg,transparent,var(--gold))}
+.rhe-r{height:1px;width:38px;background:linear-gradient(270deg,transparent,var(--gold))}
+@keyframes fadeup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.rh-title{font-family:var(--font-display);font-size:clamp(2.8rem,7vw,5.5rem);font-weight:300;font-style:italic;line-height:.92;margin-bottom:12px;background:linear-gradient(135deg,var(--mg5) 0%,var(--mg4) 25%,var(--mg3) 48%,var(--gold2) 65%,var(--mg3) 80%,var(--mg5) 100%);background-size:280% 280%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer-t 5s ease-in-out infinite,fadeup .9s ease .05s both}
+@keyframes shimmer-t{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.rh-sub{font-family:var(--font-display);font-style:italic;font-size:1rem;color:rgba(255,160,225,.48);letter-spacing:.08em;margin-bottom:28px;opacity:0;animation:fadeup .8s ease .3s forwards}
+.rh-cats{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;opacity:0;animation:fadeup .8s ease .5s forwards}
+.rh-cat{font-family:var(--font-heading);font-size:.44rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,240,248,.55);padding:9px 20px;text-decoration:none;border:1px solid rgba(232,0,106,.28);transition:all .22s;background:rgba(232,0,106,.06)}
+.rh-cat:hover,.rh-cat:focus{color:var(--mg4);border-color:rgba(232,0,106,.65);background:rgba(232,0,106,.14)}
+.rh-cat-1{border-color:rgba(240,200,74,.3);color:var(--gold);background:rgba(240,200,74,.06)}
+.rh-cat-1:hover{border-color:rgba(240,200,74,.72);background:rgba(240,200,74,.12)}
+.rh-lead-bot{position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,transparent,var(--gold) 15%,var(--mg) 35%,var(--mg2) 50%,var(--mg) 65%,var(--gold) 85%,transparent)}
+
+/* ══ FLOATING DECO ══ */
+.fd-left,.fd-right{position:fixed;top:50%;z-index:4;pointer-events:none;transform:translateY(-50%)}
+.fd-left{left:clamp(4px,1.5vw,20px);animation:fd-float 5.5s ease-in-out infinite;filter:drop-shadow(0 0 12px rgba(232,0,106,.58)) drop-shadow(0 0 28px rgba(232,0,106,.22))}
+.fd-right{right:clamp(4px,1.5vw,20px);animation:fd-float 6s ease-in-out infinite .5s;filter:drop-shadow(0 0 10px rgba(232,0,106,.5)) drop-shadow(0 0 24px rgba(232,0,106,.18))}
+@keyframes fd-float{0%,100%{transform:translateY(-50%) rotate(-3deg)}50%{transform:translateY(calc(-50% - 14px)) rotate(3deg)}}
+.fd-sym{position:absolute;font-family:var(--font-display);font-size:.9rem;color:var(--mg3);opacity:0;animation:fd-sym var(--d,2s) ease-out infinite var(--dl,0s);left:var(--x,0);top:var(--y,0);pointer-events:none}
+@keyframes fd-sym{0%{opacity:0;transform:scale(0)}35%{opacity:.9;transform:scale(1.2)}100%{opacity:0;transform:scale(.1) translateY(-14px)}}
+.rc-spark{border-radius:50%;animation:wspk var(--d,1.5s) ease-out infinite var(--dl,0s)}
+@keyframes wspk{0%{opacity:0;transform:translate(0,0) scale(0)}35%{opacity:1;transform:translate(var(--tx,4px),var(--ty,-8px)) scale(1.2)}100%{opacity:0;transform:translate(var(--tx2,8px),var(--ty2,-18px)) scale(.1)}}
+
+/* ══ SECTION INNER ══ */
+.recs-inner{padding:72px 52px;background:var(--dark3)}
+
+/* ══ MUST READS ══ */
+.must-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:4px;background:rgba(232,0,106,.06);margin-top:44px}
+.must-card{background:var(--dark4);display:flex;flex-direction:column;overflow:hidden;position:relative;transition:background .28s}
+.must-card:hover{background:rgba(48,12,60,.98)}
+/* Unique accent per card variant */
+.must-card-1{border-bottom:3px solid var(--mg)}
+.must-card-2{border-bottom:3px solid var(--gold)}
+.must-card-3{border-bottom:3px solid var(--v2)}
+.mc-top-panel{flex-shrink:0;overflow:hidden;background:linear-gradient(180deg,var(--dark2),var(--dark3));position:relative}
+.mc-top-panel svg{display:block}
+.mc-body{padding:28px 28px 24px;display:flex;flex-direction:column;gap:12px;position:relative;z-index:2}
+.mc-badges{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mc-must-badge{font-family:var(--font-heading);font-size:.38rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(240,200,74,.35);padding:2px 9px;background:rgba(240,200,74,.08)}
+.mc-type{font-family:var(--font-heading);font-size:.38rem;letter-spacing:.16em;text-transform:uppercase}
+.mc-title{font-family:var(--font-display);font-size:clamp(1.5rem,2.2vw,2rem);font-weight:400;font-style:italic;color:var(--mg5);line-height:1.15;transition:color .25s}
+.must-card:hover .mc-title{color:#fff}
+.mc-creator{font-family:var(--font-heading);font-size:.4rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(200,130,180,.42)}
+.mc-desc{font-style:italic;font-size:.92rem;color:rgba(255,175,225,.65);line-height:1.82}
+.mc-rating-row{display:flex;align-items:baseline;gap:12px}
+.mc-score{font-family:var(--font-display);font-size:2.8rem;font-weight:300;font-style:italic;color:var(--mg2);line-height:1;filter:drop-shadow(0 0 10px rgba(232,0,106,.45))}
+.mc-stars-wrap{display:flex;flex-direction:column;gap:2px}
+.mc-stars{color:var(--gold);letter-spacing:2px;font-size:1rem;line-height:1}
+.mc-score-label{font-family:var(--font-heading);font-size:.38rem;letter-spacing:.12em;color:rgba(220,160,200,.45)}
+.mc-tags{display:flex;flex-wrap:wrap;gap:5px}
+.mc-bottom-orn{display:flex;align-items:center;gap:10px;margin-top:4px}
+.mbo-line{flex:1;height:1px;background:linear-gradient(90deg,rgba(240,200,74,.25),transparent)}
+.mbo-line:last-child{background:linear-gradient(270deg,rgba(240,200,74,.25),transparent)}
+
+/* ══ PICKS GRID ══ */
+.picks-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:rgba(232,0,106,.06);margin-top:44px}
+.pick-card{background:var(--dark4);position:relative;overflow:hidden;display:flex;flex-direction:column;transition:background .26s;animation:card-in .5s ease var(--delay,0s) both}
+@keyframes card-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.pick-card:hover{background:rgba(48,12,60,.98)}
+.pick-card:hover .pc-title{color:#fff}
+.pick-card:hover .pc-diamond{opacity:.75;transform:scale(1.6)}
+.pick-card:hover .pc-body::after{left:120%}
+.pc-accent-bar{height:4px;flex-shrink:0;background:linear-gradient(90deg,var(--ac),color-mix(in srgb,var(--ac) 65%,#fff 35%),var(--ac))}
+.pc-body{padding:22px 20px;flex:1;display:flex;flex-direction:column;gap:9px;position:relative;overflow:hidden}
+.pc-body::after{content:'';position:absolute;top:0;left:-100%;width:55%;height:100%;background:linear-gradient(90deg,transparent,rgba(232,0,106,.05),transparent);transition:left .5s;pointer-events:none}
+.pc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.pc-type{font-family:var(--font-heading);font-size:.4rem;letter-spacing:.16em;text-transform:uppercase;line-height:1.4}
+.pc-status{color:rgba(200,140,180,.55)}
+.pc-score{font-family:var(--font-display);font-size:1.6rem;font-weight:300;font-style:italic;color:var(--mg2);line-height:1;flex-shrink:0}
+.pc-title{font-family:var(--font-display);font-size:1.05rem;font-weight:400;font-style:italic;color:var(--mg5);line-height:1.25;transition:color .25s;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pc-creator{font-family:var(--font-heading);font-size:.38rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(200,130,180,.38)}
+.pc-desc{font-style:italic;font-size:.82rem;color:rgba(255,170,215,.55);line-height:1.75;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.pc-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:8px;border-top:1px solid rgba(232,0,106,.1)}
+.pc-stars{color:var(--gold);letter-spacing:1px;font-size:.82rem}
+.pc-tags{display:flex;gap:4px;flex-wrap:wrap}
+.pc-diamond{position:absolute;top:16px;right:14px;width:8px;height:8px;clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);background:var(--ac);opacity:.25;transition:opacity .25s,transform .25s}
+
+/* Shared tag pill */
+.rc-tag{font-family:var(--font-heading);font-size:.38rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(232,0,106,.62);border:1px solid rgba(232,0,106,.18);padding:1px 7px;transition:all .2s}
+.rc-tag:hover{color:var(--mg3);border-color:rgba(232,0,106,.48)}
+
+/* ══ CLOSING NOTE ══ */
+.recs-note-inner{padding:64px 52px;background:var(--dark2);display:grid;grid-template-columns:140px 1fr 140px;align-items:center;gap:36px}
+.note-glass{opacity:.52;transition:opacity .3s;align-self:stretch;display:flex;align-items:center}
+.note-glass:hover{opacity:.8}
+.note-glass svg{width:100%;height:auto}
+.note-body{text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px}
+.note-ornament{opacity:.72}
+.note-quote{font-family:var(--font-display);font-style:italic;font-size:clamp(1rem,1.6vw,1.3rem);font-weight:300;color:var(--mg5);line-height:1.75;max-width:600px;text-shadow:0 0 24px rgba(232,0,106,.12);border:none;padding:0;margin:0}
+.note-sig{font-family:var(--font-heading);font-size:.44rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);opacity:.72}
+.note-cta{font-family:var(--font-heading);font-size:.44rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mg3);border:1px solid rgba(232,0,106,.32);padding:10px 22px;text-decoration:none;transition:all .25s;background:rgba(232,0,106,.06)}
+.note-cta:hover{color:var(--mg4);border-color:rgba(232,0,106,.65);background:rgba(232,0,106,.14)}
+
+/* ══ LIGHT MODE ══ */
+body.light #recs-hero{background:linear-gradient(180deg,#fce8f5 0%,#f0d8ee 60%,#fce8f5 100%)}
+body.light .rh-vignette{background:radial-gradient(ellipse at 50% 50%,transparent 30%,rgba(200,120,200,.18) 100%)}
+body.light .rh-title{background:linear-gradient(135deg,#a00050 0%,#e8006a 40%,#b06000 70%,#e8006a 100%);-webkit-background-clip:text;background-clip:text}
+body.light .rh-sub{color:rgba(100,20,80,.55)}
+body.light .recs-inner,.body.light .recs-note-inner{background:var(--dark3)}
+body.light .must-card,.body.light .pick-card{background:#ffffff}
+body.light .mc-title,.body.light .pc-title{color:#1a0828}
+body.light .mc-desc,.body.light .pc-desc{color:rgba(60,10,80,.62)}
+body.light .fd-left,.body.light .fd-right{display:none}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:1100px){
+  .fd-left,.fd-right{display:none}
+  .recs-inner{padding:52px 36px}
+  .recs-note-inner{padding:52px 36px}
+}
+@media(max-width:860px){
+  .picks-grid{grid-template-columns:1fr 1fr}
+  .must-grid{grid-template-columns:1fr}
+  .recs-note-inner{grid-template-columns:1fr;gap:20px}
+  .note-glass{display:none}
+  .recs-inner{padding:40px 20px}
+}
+@media(max-width:540px){
+  .picks-grid{grid-template-columns:1fr}
+  .rh-cats{flex-direction:column;align-items:center}
+}
+</style>

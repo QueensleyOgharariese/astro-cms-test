@@ -1,0 +1,95 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', ({ data }) => !data.draft);
+  const tagSet = new Set<string>();
+  posts.forEach(p => p.data.tags.forEach(t => tagSet.add(t)));
+  return [...tagSet].map(tag => ({ params: { tag } }));
+}
+
+const { tag } = Astro.params;
+const all = await getCollection('posts', ({ data }) => !data.draft && data.tags.includes(tag!));
+const posts = all.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const catLabels: Record<string, string> = {
+  manhwa: 'Manhwa', manga: 'Manga', anime: 'Anime', style: 'Style'
+};
+function formatDate(d: Date) {
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+---
+<Base title={`#${tag}`}>
+
+<div class="tag-page">
+  <div class="tag-header">
+    <div class="tag-header-bg"></div>
+    <div class="tag-header-inner">
+      <div class="tag-breadcrumb">
+        <a href="/">Home</a><span>·</span>
+        <a href="/tags">Tags</a><span>·</span>
+        <span>#{tag}</span>
+      </div>
+      <h1 class="tag-title">#{tag}</h1>
+      <p class="tag-count">{posts.length} post{posts.length !== 1 ? 's' : ''}</p>
+    </div>
+    <div class="tag-lead"></div>
+  </div>
+
+  <div class="tag-body">
+    {posts.length === 0 ? (
+      <div class="tag-empty">
+        <p>No posts tagged with #{tag} yet.</p>
+        <a class="btn btn-outline" href="/tags"><span>← All tags</span></a>
+      </div>
+    ) : (
+      <div class="tag-grid">
+        {posts.map((post, i) => (
+          <a class="post-card" href={`/posts/${post.slug}`}
+            style={i%2===0?"border-top-color:rgba(224,0,154,.55)":"border-top-color:rgba(240,200,74,.45)"}>
+            <div class="post-card-cat">{catLabels[post.data.category]}</div>
+            <div class="post-card-title">{post.data.title}</div>
+            <div class="post-card-meta">
+              {formatDate(post.data.pubDate)}
+              {post.data.rating ? ` · ${post.data.rating}/10` : ''}
+            </div>
+            <div class="post-card-arrow">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</div>
+
+</Base>
+
+<style>
+.tag-page { background: var(--dark2); min-height: 100vh; }
+.tag-header { background: linear-gradient(162deg, #080214, #16062a, #0e0420); padding: 64px 52px 52px; position: relative; overflow: hidden; }
+.tag-header-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at 35% 55%, rgba(224,0,154,.18) 0%, transparent 55%); }
+.tag-lead { position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, transparent, var(--gold), var(--mg), var(--mg2), var(--mg), var(--gold), transparent); }
+.tag-header-inner { position: relative; z-index: 2; max-width: 900px; margin: 0 auto; }
+.tag-breadcrumb { font-family: var(--font-heading); font-size: .42rem; letter-spacing: .2em; text-transform: uppercase; color: rgba(224,0,154,.4); margin-bottom: 16px; display: flex; gap: 8px; }
+.tag-breadcrumb a { color: rgba(224,0,154,.4); text-decoration: none; transition: color .2s; }
+.tag-breadcrumb a:hover { color: var(--mg3); }
+.tag-title { font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 300; font-style: italic; color: var(--mg4); margin-bottom: 10px; }
+.tag-count { font-family: var(--font-heading); font-size: .5rem; letter-spacing: .22em; text-transform: uppercase; color: rgba(224,0,154,.4); }
+.tag-body { max-width: 1100px; margin: 0 auto; padding: 52px; }
+.tag-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: rgba(224,0,154,.06); }
+.tag-empty { text-align: center; padding: 80px 0; }
+.tag-empty p { font-family: var(--font-display); font-style: italic; color: rgba(255,160,232,.4); margin-bottom: 28px; }
+
+@media (max-width: 860px) {
+  .tag-header { padding: 48px 24px 40px; }
+  .tag-body { padding: 32px 24px; }
+  .tag-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 540px) {
+  .tag-grid { grid-template-columns: 1fr; }
+}
+</style>

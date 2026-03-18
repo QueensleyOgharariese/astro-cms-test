@@ -1,0 +1,78 @@
+# Decap CMS — Little Confidants
+# Modalità locale: i file vengono salvati direttamente sul tuo PC
+
+backend:
+  name: git-gateway  # viene ignorato in local_backend mode
+
+local_backend: true  # ← usa il proxy locale, niente cloud
+
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+
+  # ── Blog ──────────────────────────────────────────
+  - name: "blog"
+    label: "Blog Posts"
+    folder: "content/blog"
+    create: true
+    slug: "{{slug}}"
+    extension: "mdx"
+    format: "frontmatter"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Date", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        default: "diary"
+        options:
+          - { label: "Rofan & Manhwa", value: "rofan-manhwa" }
+          - { label: "Otome", value: "otome" }
+          - { label: "Anime & Manga", value: "anime-manga" }
+          - { label: "Video Games", value: "videogames" }
+          - { label: "Style", value: "style" }
+          - { label: "Music", value: "music" }
+          - { label: "Diary", value: "diary" }
+      - { label: "Cover Image", name: "cover", widget: "image", required: false }
+      - { label: "Excerpt", name: "excerpt", widget: "text", required: false }
+      - { label: "Content", name: "body", widget: "markdown" }
+
+  # ── Recommendations ───────────────────────────────
+  - name: "recommendations"
+    label: "Recommendations"
+    folder: "content/recommendations"
+    create: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - label: "Type"
+        name: "type"
+        widget: "select"
+        default: "manhwa"
+        options:
+          - { label: "Manhwa", value: "manhwa" }
+          - { label: "Manga", value: "manga" }
+          - { label: "Video Game", value: "videogame" }
+          - { label: "Style", value: "style" }
+      - { label: "Rating (1-5)", name: "rating", widget: "number", min: 1, max: 5, value_type: "int" }
+      - { label: "Cover", name: "cover", widget: "image", required: false }
+      - { label: "Tags", name: "tags", widget: "list", default: [] }
+      - { label: "Short note", name: "note", widget: "text", required: false }
+
+  # ── Now Page ──────────────────────────────────────
+  - name: "now"
+    label: "Now Page"
+    files:
+      - name: "now"
+        label: "What I'm doing now"
+        file: "content/now.md"
+        fields:
+          - { label: "📚 Reading", name: "reading", widget: "string", required: false }
+          - { label: "📺 Watching", name: "watching", widget: "string", required: false }
+          - { label: "🎮 Playing", name: "playing", widget: "string", required: false }
+          - { label: "🎵 Listening to", name: "listening", widget: "string", required: false }
+          - { label: "✨ Mood", name: "mood", widget: "string", required: false }
+          - { label: "Last updated", name: "updatedAt", widget: "datetime", format: "YYYY-MM-DD", required: false }

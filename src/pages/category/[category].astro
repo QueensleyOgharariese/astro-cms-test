@@ -1,0 +1,103 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const categories = ['manhwa', 'manga', 'anime', 'style'] as const;
+  return categories.map(cat => ({ params: { category: cat } }));
+}
+
+const { category } = Astro.params;
+const all = await getCollection('posts', ({ data }) => !data.draft && data.category === category);
+const posts = all.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const catLabels: Record<string, string> = {
+  manhwa: 'Manhwa', manga: 'Manga', anime: 'Anime', style: 'Style'
+};
+const catColors: Record<string, string> = {
+  manhwa: 'var(--mg)', manga: 'var(--gold)', anime: 'var(--v2)', style: 'var(--t)'
+};
+
+function formatDate(d: Date) {
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+---
+<Base title={catLabels[category!] || category!}>
+
+<div class="cat-page">
+  <!-- Header -->
+  <div class="cat-header">
+    <div class="cat-header-bg"></div>
+    <div class="cat-header-inner">
+      <div class="cat-breadcrumb">
+        <a href="/">Home</a>
+        <span>·</span>
+        <span>{catLabels[category!]}</span>
+      </div>
+      <h1 class="cat-title" style={`color:${catColors[category!]}`}>{catLabels[category!]}</h1>
+      <p class="cat-count">{posts.length} post{posts.length !== 1 ? 's' : ''}</p>
+    </div>
+    <div class="cat-lead"></div>
+  </div>
+
+  <!-- Posts grid -->
+  <div class="cat-body">
+    {posts.length === 0 ? (
+      <div class="cat-empty">
+        <p>No posts yet in this category. Check back soon!</p>
+        <a class="btn btn-outline" href="/"><span>← Back home</span></a>
+      </div>
+    ) : (
+      <div class="cat-grid">
+        {posts.map((post, i) => (
+          <a class="post-card" href={`/posts/${post.slug}`}
+            style={i%2===0?"border-top-color:rgba(224,0,154,.55)":"border-top-color:rgba(240,200,74,.45)"}>
+            <div class="post-card-cat">{catLabels[post.data.category]}</div>
+            <div class="post-card-title">{post.data.title}</div>
+            <div class="post-card-meta">
+              {formatDate(post.data.pubDate)}
+              {post.data.rating ? ` · ${post.data.rating}/10` : ''}
+            </div>
+            <div class="post-card-arrow">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+  </div>
+</div>
+
+</Base>
+
+<style>
+.cat-page { background: var(--dark2); min-height: 100vh; }
+.cat-header { background: linear-gradient(162deg, #080214, #16062a, #0e0420); padding: 64px 52px 52px; position: relative; overflow: hidden; }
+.cat-header-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 30% 60%, rgba(224,0,154,.2) 0%, transparent 55%),
+              radial-gradient(ellipse at 80% 20%, rgba(240,200,74,.08) 0%, transparent 45%);
+}
+.cat-lead { position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, transparent, var(--gold), var(--mg), var(--mg2), var(--mg), var(--gold), transparent); }
+.cat-header-inner { position: relative; z-index: 2; max-width: 900px; margin: 0 auto; }
+.cat-breadcrumb { font-family: var(--font-heading); font-size: .42rem; letter-spacing: .2em; text-transform: uppercase; color: rgba(224,0,154,.4); margin-bottom: 16px; display: flex; gap: 8px; }
+.cat-breadcrumb a { color: rgba(224,0,154,.4); text-decoration: none; transition: color .2s; }
+.cat-breadcrumb a:hover { color: var(--mg3); }
+.cat-title { font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 300; font-style: italic; line-height: 1; margin-bottom: 10px; text-shadow: 0 0 40px rgba(224,0,154,.3); }
+.cat-count { font-family: var(--font-heading); font-size: .5rem; letter-spacing: .22em; text-transform: uppercase; color: rgba(224,0,154,.4); }
+.cat-body { max-width: 1100px; margin: 0 auto; padding: 52px; }
+.cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: rgba(224,0,154,.06); }
+.cat-empty { text-align: center; padding: 80px 0; }
+.cat-empty p { font-family: var(--font-display); font-style: italic; font-size: 1.1rem; color: rgba(255,160,232,.4); margin-bottom: 28px; }
+
+@media (max-width: 860px) {
+  .cat-header { padding: 48px 24px 40px; }
+  .cat-body { padding: 32px 24px; }
+  .cat-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 540px) {
+  .cat-grid { grid-template-columns: 1fr; }
+}
+</style>

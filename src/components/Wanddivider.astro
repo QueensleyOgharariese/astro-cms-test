@@ -1,0 +1,111 @@
+---
+interface Props { text?: string; }
+const { text } = Astro.props;
+---
+<div class="wd-div" aria-hidden="true">
+  <!-- Left arm: stars + line -->
+  <div class="wd-arm wd-arm-l">
+    <div class="wd-line"></div>
+    <svg class="wd-star wd-star-sm" viewBox="0 0 20 20" fill="none">
+      <path d="M10 1 L11.8 7 L18 7 L13 11 L15 17 L10 13.5 L5 17 L7 11 L2 7 L8.2 7 Z" fill="rgba(240,200,74,.55)" stroke="rgba(240,200,74,.35)" stroke-width=".8"/>
+      <circle cx="10" cy="10" r="2" fill="rgba(255,248,160,.8)"/>
+    </svg>
+    <div class="wd-line"></div>
+    <svg class="wd-star wd-star-xs" viewBox="0 0 14 14" fill="none">
+      <path d="M7 0 L8.2 4.8 L13 5.2 L9.2 8 L10.5 13 L7 10.5 L3.5 13 L4.8 8 L1 5.2 L5.8 4.8 Z" fill="rgba(232,0,106,.45)"/>
+    </svg>
+    <div class="wd-line"></div>
+    <!-- Heart float -->
+    <svg class="wd-heart" viewBox="0 0 16 14" fill="none">
+      <path d="M8 13 C8 13 1 8.5 1 4.5 C1 2.2 2.8 1 5 1 C6.2 1 8 3 8 3 C8 3 9.8 1 11 1 C13.2 1 15 2.2 15 4.5 C15 8.5 8 13 8 13Z" fill="rgba(232,0,106,.5)" stroke="rgba(255,160,210,.4)" stroke-width=".8"/>
+    </svg>
+    <div class="wd-line wd-line-long"></div>
+  </div>
+
+  <!-- Center wand -->
+  <div class="wd-center-piece">
+    <svg class="wd-wand-h" viewBox="0 0 120 44" fill="none">
+      <defs>
+        <linearGradient id="wdh-shaft" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%"   stop-color="rgba(232,0,106,.2)"/>
+          <stop offset="40%"  stop-color="rgba(232,0,106,.85)"/>
+          <stop offset="60%"  stop-color="rgba(232,0,106,.85)"/>
+          <stop offset="100%" stop-color="rgba(232,0,106,.2)"/>
+        </linearGradient>
+        <linearGradient id="wdh-gold" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#fff5a0"/>
+          <stop offset="100%" stop-color="#c88800"/>
+        </linearGradient>
+        <filter id="wdh-glow" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="2" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <!-- Shaft -->
+      <rect x="18" y="20" width="84" height="4" rx="2" fill="url(#wdh-shaft)"/>
+      <!-- Shaft highlight -->
+      <rect x="18" y="20" width="84" height="1.2" rx=".6" fill="rgba(255,160,210,.3)"/>
+      <!-- Collar left -->
+      <ellipse cx="22" cy="22" rx="5" ry="8" fill="rgba(240,200,74,.65)" stroke="rgba(255,235,130,.6)" stroke-width=".9"/>
+      <circle cx="22" cy="22" r="2.5" fill="url(#wdh-gold)"/>
+      <!-- Collar right -->
+      <ellipse cx="98" cy="22" rx="5" ry="8" fill="rgba(240,200,74,.65)" stroke="rgba(255,235,130,.6)" stroke-width=".9"/>
+      <circle cx="98" cy="22" r="2.5" fill="url(#wdh-gold)"/>
+      <!-- Star tip left -->
+      <path d="M8 22 L9.5 17 L14 15 L9.5 13 L8 8 L6.5 13 L2 15 L6.5 17 Z" fill="rgba(240,200,74,.9)" filter="url(#wdh-glow)"/>
+      <circle cx="8" cy="15" r="2.5" fill="rgba(255,248,200,.9)"/>
+      <!-- Star tip right -->
+      <path d="M112 22 L113.5 17 L118 15 L113.5 13 L112 8 L110.5 13 L106 15 L110.5 17 Z" fill="rgba(240,200,74,.9)" filter="url(#wdh-glow)"/>
+      <circle cx="112" cy="15" r="2.5" fill="rgba(255,248,200,.9)"/>
+      <!-- Center heart gem -->
+      <circle cx="60" cy="22" r="10" fill="rgba(232,0,106,.2)" stroke="rgba(240,200,74,.5)" stroke-width="1.2"/>
+      <circle cx="60" cy="22" r="7"  fill="rgba(50,0,30,.6)"/>
+      <path d="M60 27 C60 27 54 23.5 54 20 C54 17.8 55.8 16.5 58 16.5 C59.2 16.5 60 18 60 18 C60 18 60.8 16.5 62 16.5 C64.2 16.5 66 17.8 66 20 C66 23.5 60 27 60 27Z" fill="rgba(232,0,106,.92)" filter="url(#wdh-glow)"/>
+      <path d="M56 18 C55.5 19 55.2 20.5 55.8 22" stroke="rgba(255,255,255,.55)" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- Wings -->
+      <path d="M28 18 Q40 14 50 18" fill="none" stroke="rgba(240,200,74,.35)" stroke-width=".9" stroke-dasharray="3 4"/>
+      <path d="M70 18 Q80 14 92 18" fill="none" stroke="rgba(240,200,74,.35)" stroke-width=".9" stroke-dasharray="3 4"/>
+      <!-- Sparkles -->
+      <circle cx="35" cy="12" r="1.5" fill="rgba(255,200,240,.7)" class="wdh-sp" style="animation:wdh-blink 2.2s ease-in-out infinite"/>
+      <circle cx="85" cy="12" r="1.5" fill="rgba(255,200,240,.7)" class="wdh-sp" style="animation:wdh-blink 1.9s ease-in-out infinite .4s"/>
+      <circle cx="44" cy="10" r="1.2" fill="rgba(240,200,74,.6)"  class="wdh-sp" style="animation:wdh-blink 2.5s ease-in-out infinite .8s"/>
+      <circle cx="76" cy="10" r="1.2" fill="rgba(240,200,74,.6)"  class="wdh-sp" style="animation:wdh-blink 2s ease-in-out infinite 1.2s"/>
+    </svg>
+    {text && <span class="wd-text">{text}</span>}
+  </div>
+
+  <!-- Right arm: mirror of left -->
+  <div class="wd-arm wd-arm-r">
+    <div class="wd-line wd-line-long"></div>
+    <svg class="wd-heart" viewBox="0 0 16 14" fill="none">
+      <path d="M8 13 C8 13 1 8.5 1 4.5 C1 2.2 2.8 1 5 1 C6.2 1 8 3 8 3 C8 3 9.8 1 11 1 C13.2 1 15 2.2 15 4.5 C15 8.5 8 13 8 13Z" fill="rgba(232,0,106,.5)" stroke="rgba(255,160,210,.4)" stroke-width=".8"/>
+    </svg>
+    <div class="wd-line"></div>
+    <svg class="wd-star wd-star-xs" viewBox="0 0 14 14" fill="none">
+      <path d="M7 0 L8.2 4.8 L13 5.2 L9.2 8 L10.5 13 L7 10.5 L3.5 13 L4.8 8 L1 5.2 L5.8 4.8 Z" fill="rgba(232,0,106,.45)"/>
+    </svg>
+    <div class="wd-line"></div>
+    <svg class="wd-star wd-star-sm" viewBox="0 0 20 20" fill="none">
+      <path d="M10 1 L11.8 7 L18 7 L13 11 L15 17 L10 13.5 L5 17 L7 11 L2 7 L8.2 7 Z" fill="rgba(240,200,74,.55)" stroke="rgba(240,200,74,.35)" stroke-width=".8"/>
+      <circle cx="10" cy="10" r="2" fill="rgba(255,248,160,.8)"/>
+    </svg>
+    <div class="wd-line"></div>
+  </div>
+</div>
+
+<style>
+@keyframes wdh-blink{0%,100%{opacity:.3}50%{opacity:1}}
+.wd-div{display:flex;align-items:center;gap:0;width:100%;padding:18px 0;position:relative;z-index:5}
+.wd-arm{display:flex;align-items:center;gap:8px;flex:1;overflow:hidden}
+.wd-arm-r{flex-direction:row-reverse}
+.wd-line{height:1px;flex:1;background:linear-gradient(90deg,transparent,rgba(240,200,74,.35))}
+.wd-arm-r .wd-line{background:linear-gradient(270deg,transparent,rgba(240,200,74,.35))}
+.wd-line-long{flex:2}
+.wd-star-sm{width:18px;height:18px;flex-shrink:0;filter:drop-shadow(0 0 4px rgba(240,200,74,.5))}
+.wd-star-xs{width:13px;height:13px;flex-shrink:0}
+.wd-heart{width:14px;height:12px;flex-shrink:0;animation:wd-heartbeat 2.5s ease-in-out infinite;filter:drop-shadow(0 0 4px rgba(232,0,106,.6))}
+@keyframes wd-heartbeat{0%,100%{transform:scale(1)}40%{transform:scale(1.18)}60%{transform:scale(1.08)}}
+.wd-center-piece{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0}
+.wd-wand-h{width:120px;height:44px}
+.wd-text{font-family:var(--font-heading);font-size:.38rem;letter-spacing:.28em;text-transform:uppercase;color:rgba(240,200,74,.55)}
+</style>

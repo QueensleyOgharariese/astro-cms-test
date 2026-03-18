@@ -1,0 +1,97 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="404 — Lost in the dark" description="Page not found.">
+<section id="page-404">
+  <div class="p404-bg"></div>
+  <div class="p404-stars" aria-hidden="true">
+    {Array.from({length:35}).map((_,i)=>(
+      <div class="p404-star" style={`--x:${Math.round(4+(i*2.8))}%;--y:${Math.round(5+(i*8.3)%88)}%;--s:${0.3+((i*7)%6)/10};--d:${1.8+(i*0.38)%3.2}s;--dl:${(i*0.27)%2.8}s`}></div>
+    ))}
+  </div>
+
+  <div class="p404-inner">
+
+    <!-- Floating lost cat -->
+    <div class="p404-cat-wrap">
+      <div class="p404-cat-glow"></div>
+      <!-- Sparkles orbiting cat -->
+      <div class="p404-orbit-wrap" aria-hidden="true">
+        <div class="p404-orb" style="--or:90px;--od:5s;--odl:0s">✦</div>
+        <div class="p404-orb" style="--or:90px;--od:5s;--odl:-1.66s">♡</div>
+        <div class="p404-orb" style="--or:90px;--od:5s;--odl:-3.33s">✧</div>
+        <div class="p404-orb" style="--or:130px;--od:9s;--odl:0s">✦</div>
+        <div class="p404-orb" style="--or:130px;--od:9s;--odl:-4.5s">♡</div>
+      </div>
+
+      <svg class="p404-cat-svg" viewBox="0 0 120 150" fill="none">
+  <!-- Long ears — one slightly drooping (lost!) -->
+  <rect x="30" y="4" width="16" height="50" rx="8" fill="#1a0828"/>
+  <rect x="34" y="8" width="8" height="40" rx="4" fill="rgba(232,0,106,.5)"/>
+  <!-- Right ear droops -->
+  <rect x="74" y="10" width="16" height="46" rx="8" fill="#1a0828" transform="rotate(18 82 10)"/>
+  <rect x="78" y="14" width="8" height="36" rx="4" fill="rgba(232,0,106,.45)" transform="rotate(18 82 14)"/>
+  <!-- Head -->
+  <circle cx="60" cy="76" r="34" fill="#1a0828"/>
+  <!-- Crescent moon — small, tilted -->
+  <g transform="rotate(-15 60 56)">
+    <circle cx="60" cy="56" r="7" fill="#f5d840"/>
+    <circle cx="64" cy="54" r="5.5" fill="#1a0828"/>
+  </g>
+  <!-- ? floating -->
+  <text x="76" y="50" font-size="15" fill="rgba(240,200,74,.7)" font-family="serif"
+    style="animation:p4-wobble 2s ease-in-out infinite">?</text>
+  <!-- Eyes: wide open (worried) -->
+  <circle cx="46" cy="78" r="9" fill="rgba(255,255,255,.92)"/>
+  <circle cx="46" cy="79" r="6.5" fill="#3a0070"/>
+  <circle cx="46" cy="79" r="3" fill="#0a0010"/>
+  <circle cx="43.5" cy="76" r="2.5" fill="rgba(255,255,255,.95)"/>
+  <circle cx="74" cy="78" r="9" fill="rgba(255,255,255,.92)"/>
+  <circle cx="74" cy="79" r="6.5" fill="#3a0070"/>
+  <circle cx="74" cy="79" r="3" fill="#0a0010"/>
+  <circle cx="71.5" cy="76" r="2.5" fill="rgba(255,255,255,.95)"/>
+  <!-- Nose -->
+  <circle cx="60" cy="89" r="3" fill="rgba(255,140,180,.85)"/>
+  <!-- Worried mouth -->
+  <path d="M52 96 Q56 92 60 94 Q64 92 68 96" fill="none" stroke="rgba(255,160,180,.7)" stroke-width="2" stroke-linecap="round"/>
+  <!-- Body -->
+  <ellipse cx="60" cy="130" rx="30" ry="20" fill="#1a0828"/>
+  <!-- One paw raised -->
+  <ellipse cx="24" cy="122" rx="12" ry="9" fill="#1a0828" transform="rotate(-25 24 122)"/>
+  <!-- Bow -->
+  <path d="M60 110 C55 106 46 105 46 110 C46 115 58 114 60 111Z" fill="#e8006a"/>
+  <path d="M60 110 C65 106 74 105 74 110 C74 115 62 114 60 111Z" fill="#e8006a"/>
+  <circle cx="60" cy="110" r="5" fill="#ff88cc"/>
+  <circle cx="59.5" cy="109.5" r="1.8" fill="rgba(255,255,255,.85)"/>
+  <!-- Paws at bottom -->
+  <ellipse cx="40" cy="146" rx="14" ry="7" fill="#1a0828"/>
+  <ellipse cx="80" cy="146" rx="14" ry="7" fill="#1a0828"/>
+  <!-- Tail -->
+  <circle cx="88" cy="128" r="8" fill="rgba(255,255,255,.18)"/>
+  <circle cx="88" cy="128" r="5" fill="rgba(255,255,255,.28)"/>
+</svg>
+    </div>
+
+    <!-- Text -->
+    <div class="p404-text">
+      <div class="p404-eyebrow"><div class="p4e-l"></div>error 404<div class="p4e-r"></div></div>
+      <h1 class="p404-title">Lost in the dark</h1>
+      <p class="p404-body">This page wandered off somewhere between dimensions. Even the magic cat can't find it.</p>
+      <div class="p404-actions">
+        <a class="p404-btn-home" href="/">← Back home</a>
+        <a class="p404-btn-blog" href="/blog">Read something →</a>
+      </div>
+      <!-- Floating symbols -->
+      <div class="p404-floats" aria-hidden="true">
+        <span class="p4f" style="--x:-40px;--y:20px;--d:3s;--dl:0s">✦</span>
+        <span class="p4f" style="--x:60px;--y:-10px;--d:2.5s;--dl:.6s">♡</span>
+        <span class="p4f" style="--x:-20px;--y:60px;--d:3.5s;--dl:1.2s">✧</span>
+        <span class="p4f" style="--x:80px;--y:40px;--d:2.8s;--dl:.4s">✦</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<style>#page-404{min-height:100vh;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,var(--dark) 0%,var(--dark2) 50%,var(--dark) 100%)}.p404-bg{position:absolute;inset:0;background:radial-gradient(ellipse 55% 50% at 50% 45%,rgba(232,0,106,.16) 0%,transparent 65%),radial-gradient(ellipse 30% 35% at 15% 20%,rgba(140,0,180,.1) 0%,transparent 55%)}.p404-stars{position:absolute;inset:0;pointer-events:none}.p404-star{position:absolute;left:var(--x);top:var(--y);width:calc(3px * var(--s));height:calc(3px * var(--s));background:rgba(255,240,248,1);border-radius:50%;animation:p4-twinkle var(--d) ease-in-out infinite var(--dl);box-shadow:0 0 4px rgba(255,200,230,.8)}@keyframes p4-twinkle{0%,100%{opacity:.15;transform:scale(1)}50%{opacity:.95;transform:scale(1.6)}}.p404-inner{position:relative;z-index:10;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:64px;max-width:960px;padding:0 40px}.p404-cat-wrap{position:relative;display:flex;align-items:center;justify-content:center}.p404-cat-glow{position:absolute;width:320px;height:320px;border-radius:50%;background:radial-gradient(ellipse,rgba(232,0,106,.2) 0%,rgba(140,0,180,.1) 40%,transparent 70%);animation:p4-glow-pulse 3.5s ease-in-out infinite;pointer-events:none}@keyframes p4-glow-pulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:.9;transform:scale(1.08)}}.p404-cat-svg{width:min(260px,80vw);height:auto;position:relative;z-index:2;animation:p4-float 5s ease-in-out infinite;filter:drop-shadow(0 0 20px rgba(232,0,106,.65)) drop-shadow(0 0 44px rgba(232,0,106,.28))}@keyframes p4-float{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-16px) rotate(2deg)}}.p404-orbit-wrap{position:absolute;top:50%;left:50%;width:0;height:0;pointer-events:none;z-index:3}.p404-orb{position:absolute;font-family:var(--font-display);font-size:1rem;color:var(--mg3);animation:p4-orb var(--od) linear infinite var(--odl)}@keyframes p4-orb{from{transform:rotate(0deg) translateX(var(--or)) rotate(0deg)}to{transform:rotate(360deg) translateX(var(--or)) rotate(-360deg)}}.p404-text{display:flex;flex-direction:column;gap:20px;position:relative}.p404-eyebrow{font-family:var(--font-heading);font-size:.46rem;letter-spacing:.52em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:10px}.p4e-l{height:1px;width:32px;background:linear-gradient(90deg,transparent,var(--gold))}.p4e-r{height:1px;width:32px;background:linear-gradient(270deg,transparent,var(--gold))}.p404-title{font-family:var(--font-display);font-size:clamp(2.5rem,5vw,4rem);font-weight:300;font-style:italic;color:var(--mg5);line-height:1.05;background:linear-gradient(135deg,var(--mg5) 0%,var(--mg4) 30%,var(--mg3) 55%,var(--gold2) 75%,var(--mg5) 100%);background-size:280% 280%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:p4-shimmer 5s ease-in-out infinite}@keyframes p4-shimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}.p404-body{font-style:italic;font-size:.95rem;color:rgba(255,175,222,.62);line-height:1.88;max-width:380px}.p404-actions{display:flex;gap:12px;flex-wrap:wrap}.p404-btn-home,.p404-btn-blog{font-family:var(--font-heading);font-size:.46rem;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;padding:11px 24px;transition:all .25s}.p404-btn-home{color:var(--mg4);border:1px solid rgba(232,0,106,.4);background:rgba(232,0,106,.08)}.p404-btn-home:hover{background:rgba(232,0,106,.18);border-color:rgba(232,0,106,.7);color:var(--mg5)}.p404-btn-blog{color:var(--gold);border:1px solid rgba(240,200,74,.3);background:rgba(240,200,74,.06)}.p404-btn-blog:hover{background:rgba(240,200,74,.14);border-color:rgba(240,200,74,.65);color:var(--gold2)}.p404-floats{position:absolute;inset:0;pointer-events:none}.p4f{position:absolute;left:var(--x);top:var(--y);font-family:var(--font-display);font-size:.9rem;color:var(--mg3);opacity:0;animation:p4-sym var(--d) ease-out infinite var(--dl)}@keyframes p4-sym{0%{opacity:0;transform:scale(0)}40%{opacity:.8;transform:scale(1.2)}100%{opacity:0;transform:scale(.2) translateY(-14px)}}@keyframes p4-wobble{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(10deg) scale(1.15)}}@media(max-width:768px){.p404-inner{grid-template-columns:1fr;gap:36px;padding:60px 20px;text-align:center}.p404-cat-wrap{order:-1}.p404-cat-svg{width:min(200px,70vw)}.p404-body{margin:0 auto}.p404-actions{justify-content:center}.p4e-l,.p4e-r{display:none}}</style>
+</Base>

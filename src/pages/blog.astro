@@ -1,0 +1,666 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const all  = await getCollection('posts', ({ data }) => !data.draft);
+const posts = all.sort((a,b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const featured = posts[0];
+const rest     = posts.slice(1);
+
+const sample = [
+  { title:'The Remarried Empress — A Queen Who Refuses to Fall', cat:'manhwa', date:'10 Mar 2025', rating:'9.5', tags:['royalty','strong-heroine'], size:'large' },
+  { title:'Frieren: Beyond Journey\'s End Is Everything',         cat:'anime',  date:'8 Mar 2025',  rating:'10',  tags:['fantasy','emotional'],      size:'small' },
+  { title:'5 Games to Play If You Love Dark Atmospheres',         cat:'games',  date:'5 Mar 2025',  rating:null,  tags:['recs','dark'],              size:'small' },
+  { title:'Why Isekai Manhwa Heroines Hit Different in 2025',     cat:'manhwa', date:'2 Mar 2025',  rating:null,  tags:['discussion'],               size:'wide'  },
+  { title:'Dungeon Meshi — A Love Letter to Slow Food',           cat:'anime',  date:'28 Feb 2025', rating:'9',   tags:['cozy','fantasy'],           size:'small' },
+  { title:'Dark Coquette Aesthetics I\'m Obsessed With Right Now',cat:'style',  date:'25 Feb 2025', rating:null,  tags:['fashion','mood'],           size:'large' },
+  { title:'Hades II Early Access — What the Underworld Looks Like',cat:'games', date:'22 Feb 2025', rating:'8.5', tags:['action','indie'],           size:'small' },
+  { title:'My Favourite Manhwa of 2024 — The Full List',          cat:'manhwa', date:'20 Feb 2025', rating:null,  tags:['best-of','recs'],           size:'wide'  },
+  { title:'Winter 2025 Anime — Ranked After Watching Everything', cat:'anime',  date:'18 Feb 2025', rating:null,  tags:['ranking','seasonal'],       size:'small' },
+  { title:'The Outfits I\'d Wear If I Lived in a Manhwa Panel',   cat:'style',  date:'15 Feb 2025', rating:null,  tags:['fashion','manhwa'],         size:'small' },
+  { title:'Genshin Impact Natlan — Worth Coming Back For?',       cat:'games',  date:'12 Feb 2025', rating:'7.5', tags:['gacha','review'],           size:'small' },
+  { title:'A Sign of Affection — The Softest Romance Manga',      cat:'manga',  date:'9 Feb 2025',  rating:'9',   tags:['romance','slice-of-life'],  size:'small' },
+];
+
+const catLabels: Record<string,string> = { manhwa:'Manhwa', manga:'Manga', anime:'Anime', style:'Style', games:'Games' };
+const catColor:  Record<string,string> = { manhwa:'var(--mg)', manga:'var(--gold)', anime:'var(--v2)', style:'var(--t)', games:'var(--mg2)' };
+
+function fd(d:Date){ return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
+function rs(r:number|undefined){ return r!=null?`${r}/10`:''; }
+---
+
+<Base title="Blog" description="All posts — manga, manhwa, anime, style and games.">
+
+<!-- ══ HERO ══ -->
+<section id="blog-hero">
+  <div class="bh-bg"></div>
+  <div class="bh-vignette"></div>
+
+  <!-- Rose window -->
+  <svg class="bh-rose" viewBox="0 0 600 600" fill="none" aria-hidden="true">
+    <circle cx="300" cy="300" r="292" stroke="rgba(232,0,106,.6)"  stroke-width="2"/>
+    <circle cx="300" cy="300" r="238" stroke="rgba(232,0,106,.38)" stroke-width="1.2"/>
+    <circle cx="300" cy="300" r="172" stroke="rgba(140,0,180,.32)" stroke-width="1"/>
+    <circle cx="300" cy="300" r="106" stroke="rgba(232,0,106,.44)" stroke-width="1.2"/>
+    <circle cx="300" cy="300" r="50"  stroke="rgba(232,0,106,.55)" stroke-width="1.2"/>
+    <circle cx="300" cy="300" r="15"  fill="rgba(232,0,106,.38)"/>
+    <line x1="300" y1="8"   x2="300" y2="592" stroke="rgba(232,0,106,.28)" stroke-width=".7"/>
+    <line x1="8"   y1="300" x2="592" y2="300" stroke="rgba(232,0,106,.28)" stroke-width=".7"/>
+    <line x1="55"  y1="55"  x2="545" y2="545" stroke="rgba(240,200,74,.18)" stroke-width=".5"/>
+    <line x1="545" y1="55"  x2="55"  y2="545" stroke="rgba(240,200,74,.18)" stroke-width=".5"/>
+    <g opacity=".42">
+      {[0,45,90,135,180,225,270,315].map((deg,i)=>(
+        <ellipse cx="300" cy="74" rx="14" ry="25"
+          fill={i%3===0?'rgba(232,0,106,.3)':i%3===1?'rgba(240,200,74,.2)':'rgba(140,0,180,.24)'}
+          transform={`rotate(${deg} 300 300)`}/>
+      ))}
+    </g>
+  </svg>
+
+  <!-- Gothic arch with heart -->
+  <svg class="bh-arch" viewBox="0 0 380 520" fill="none" aria-hidden="true">
+    <path d="M10 520 L10 160 Q190 8 370 160 L370 520" stroke="rgba(232,0,106,.4)" stroke-width="2" fill="none"/>
+    <path d="M22 520 L22 167 Q190 26 358 167 L358 520" stroke="rgba(240,200,74,.22)" stroke-width=".7" fill="none" stroke-dasharray="4 8"/>
+    <circle cx="190" cy="120" r="30" fill="rgba(232,0,106,.12)" stroke="rgba(240,200,74,.36)" stroke-width="1"/>
+    <circle cx="143" cy="148" r="23" fill="rgba(140,0,180,.1)"  stroke="rgba(240,200,74,.24)" stroke-width=".7"/>
+    <circle cx="237" cy="148" r="23" fill="rgba(232,0,106,.1)"  stroke="rgba(240,200,74,.24)" stroke-width=".7"/>
+    <path d="M190 133 C190 133 181 127 181 121 C181 117.5 183.5 116 186 116 C187.8 116 190 118.5 190 118.5 C190 118.5 192.2 116 194 116 C196.5 116 199 117.5 199 121 C199 127 190 133 190 133Z" fill="rgba(232,0,106,.82)"/>
+  </svg>
+
+  <div class="bh-lh" style="top:22%"></div>
+  <div class="bh-lh" style="bottom:26%"></div>
+  <div class="bh-lv" style="left:7%"></div>
+  <div class="bh-lv" style="right:7%"></div>
+
+  <div class="bh-inner">
+    <div class="bh-cross" aria-hidden="true">
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+        <line x1="24" y1="4" x2="24" y2="44" stroke="rgba(232,0,106,.75)" stroke-width="1.8"/>
+        <line x1="4"  y1="24" x2="44" y2="24" stroke="rgba(232,0,106,.75)" stroke-width="1.8"/>
+        <circle cx="24" cy="24" r="8" fill="rgba(232,0,106,.48)" stroke="rgba(240,200,74,.55)" stroke-width="1"/>
+        <circle cx="24" cy="24" r="4" fill="rgba(255,140,200,.75)"/>
+        <circle cx="24" cy="5"  r="3" fill="rgba(232,0,106,.52)"/>
+        <circle cx="24" cy="43" r="3" fill="rgba(232,0,106,.52)"/>
+        <circle cx="5"  cy="24" r="3" fill="rgba(240,200,74,.48)"/>
+        <circle cx="43" cy="24" r="3" fill="rgba(240,200,74,.48)"/>
+      </svg>
+    </div>
+    <div class="bh-eyebrow"><div class="bhe-l"></div>all posts<div class="bhe-r"></div></div>
+    <h1 class="bh-title" id="blog-title-el"></h1>
+    <nav class="bh-filters">
+      <a class="bhf bhf-active" href="/blog">All</a>
+      <a class="bhf" href="/category/manhwa">Manhwa</a>
+      <a class="bhf" href="/category/manga">Manga</a>
+      <a class="bhf" href="/category/anime">Anime</a>
+      <a class="bhf" href="/category/style">Style</a>
+      <a class="bhf" href="/category/games">Games</a>
+    </nav>
+  </div>
+  <div class="bh-scroll" aria-hidden="true"><div class="bh-scroll-l"></div><div class="bh-scroll-t">scroll</div></div>
+</section>
+
+<div class="sg-strip"><div class="sg-strip-t" id="sgstrip"></div></div>
+<div class="mq"><div class="mt" id="mtrack"></div></div>
+
+<!-- Floating decorative elements — wand left, phone right -->
+
+
+
+
+<!-- ══ FEATURED POST ══ -->
+{featured && (
+  <>
+    <div class="section-lead"></div>
+    <section id="blog-featured">
+      <div class="inner-wrap">
+        <div class="sec-head">
+          <div class="sec-over"><div class="sec-rule"></div>latest post<div class="sec-rule"></div></div>
+          <div class="sec-title">Featured</div>
+        </div>
+        <a class="feat-card" href={`/posts/${featured.slug}`}>
+          <div class="feat-vis">
+            <div class="feat-vis-glow"></div>
+            <svg class="feat-window" viewBox="0 0 300 420" fill="none">
+              <rect x="4" y="4" width="292" height="412" stroke="rgba(240,200,74,.62)" stroke-width="2.2" fill="none"/>
+              <rect x="9" y="9" width="282" height="402" stroke="rgba(232,0,106,.22)" stroke-width=".8" fill="none"/>
+              <path d="M4 148 Q150 4 296 148" fill="rgba(232,0,106,.1)" stroke="rgba(240,200,74,.6)" stroke-width="2"/>
+              <circle cx="150" cy="88"  r="36" fill="rgba(232,0,106,.18)" stroke="rgba(240,200,74,.52)" stroke-width="1.5"/>
+              <circle cx="100" cy="118" r="28" fill="rgba(140,0,180,.14)" stroke="rgba(240,200,74,.36)" stroke-width="1.1"/>
+              <circle cx="200" cy="118" r="28" fill="rgba(232,0,106,.16)" stroke="rgba(240,200,74,.36)" stroke-width="1.1"/>
+              <!-- Heart in trefoil -->
+              <path d="M150 102 C150 102 140 95 140 88 C140 84 143 82 146.5 82 C148.5 82 150 84.5 150 84.5 C150 84.5 151.5 82 153.5 82 C157 82 160 84 160 88 C160 95 150 102 150 102Z" fill="rgba(255,255,255,.72)"/>
+              <path d="M150 100 C150 100 141.5 94 141.5 88 C141.5 85 143.8 83.5 146.5 83.5 C148.2 83.5 150 86 150 86 C150 86 151.8 83.5 153.5 83.5 C156.2 83.5 158.5 85 158.5 88 C158.5 94 150 100 150 100Z" fill="rgba(232,0,106,.88)"/>
+              <polygon points="150,150 200,192 150,234 100,192" fill="rgba(232,0,106,.15)" stroke="rgba(240,200,74,.5)" stroke-width="1.8"/>
+              <rect x="12"  y="148" width="72" height="110" fill="rgba(232,0,106,.09)" stroke="rgba(240,200,74,.3)" stroke-width="1.1"/>
+              <rect x="216" y="148" width="72" height="110" fill="rgba(140,0,180,.09)" stroke="rgba(240,200,74,.3)" stroke-width="1.1"/>
+              <rect x="12"  y="268" width="88" height="76"  fill="rgba(240,200,74,.07)" stroke="rgba(240,200,74,.28)" stroke-width="1.1"/>
+              <rect x="108" y="268" width="84" height="76"  fill="rgba(232,0,106,.1)"   stroke="rgba(240,200,74,.28)" stroke-width="1.1"/>
+              <rect x="200" y="268" width="88" height="76"  fill="rgba(0,200,212,.07)"  stroke="rgba(240,200,74,.28)" stroke-width="1.1"/>
+              <rect x="12"  y="352" width="276" height="60" fill="rgba(232,0,106,.07)"  stroke="rgba(240,200,74,.24)" stroke-width="1.1"/>
+              <line x1="150" y1="148" x2="150" y2="410" stroke="rgba(240,200,74,.38)" stroke-width="1.4"/>
+              <line x1="12"  y1="266" x2="288" y2="266" stroke="rgba(240,200,74,.28)" stroke-width="1.1"/>
+              <line x1="12"  y1="350" x2="288" y2="350" stroke="rgba(240,200,74,.24)" stroke-width="1"/>
+            </svg>
+            <div class="feat-badge">✦ Latest</div>
+            <div class="feat-c-tl"></div>
+            <div class="feat-c-br"></div>
+          </div>
+          <div class="feat-div"></div>
+          <div class="feat-body">
+            <div class="feat-cat" style={`color:${catColor[featured.data.category]??'var(--mg)'}`}>
+              {catLabels[featured.data.category]??featured.data.category}
+              {featured.data.spoilers && <span class="feat-spoiler">⚠ Spoilers</span>}
+            </div>
+            <h2 class="feat-title">{featured.data.title}</h2>
+            <p class="feat-desc">{featured.data.description}</p>
+            <div class="feat-meta">{fd(featured.data.pubDate)}{rs(featured.data.rating)&&` · ${rs(featured.data.rating)}`}</div>
+            {featured.data.tags.length>0 && <div class="feat-tags">{featured.data.tags.slice(0,5).map(t=><span class="feat-tag">#{t}</span>)}</div>}
+            <div class="feat-cta"><div class="feat-cta-l"></div><span>Read post</span><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+        </a>
+      </div>
+    </section>
+  </>
+)}
+
+<!-- ══ MAGAZINE GRID ══ -->
+<div class="section-lead"></div>
+<section id="blog-grid">
+  <div class="inner-wrap">
+    <div class="sec-head">
+      <div class="sec-over"><div class="sec-rule"></div>archive<div class="sec-rule"></div></div>
+      <div class="sec-title">All posts</div>
+    </div>
+
+    <div class="mag-grid">
+      <!-- Real posts -->
+      {rest.map((post,i) => {
+        const variant = (i%7)+1;
+        const ac = catColor[post.data.category]??'var(--mg)';
+        return (
+          <a class={`mg-card mg-v${variant}`} href={`/posts/${post.slug}`} style={`--ac:${ac}`}>
+            <div class="mg-stripe"></div>
+            <div class="mg-body">
+              <div class="mg-cat">{catLabels[post.data.category]??post.data.category}</div>
+              <h3 class="mg-title">{post.data.title}</h3>
+              {(variant===1||variant===4)&&<p class="mg-desc">{post.data.description}</p>}
+              <div class="mg-foot">
+                <span class="mg-date">{fd(post.data.pubDate)}</span>
+                {post.data.rating!=null&&<span class="mg-rating">{post.data.rating}/10</span>}
+              </div>
+              {post.data.tags.length>0&&<div class="mg-tags">{post.data.tags.slice(0,3).map(t=><span class="mg-tag">#{t}</span>)}</div>}
+            </div>
+            <div class="mg-diamond" aria-hidden="true"></div>
+            <div class="mg-shine"   aria-hidden="true"></div>
+            <div class="mg-arrow"   aria-hidden="true"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </a>
+        );
+      })}
+
+      <!-- Sample posts -->
+      {sample.map((post,i) => {
+        const variant = ((rest.length+i)%7)+1;
+        const ac = catColor[post.cat]??'var(--mg)';
+        return (
+          <div class={`mg-card mg-v${variant} mg-sample`} style={`--ac:${ac}`}>
+            <div class="mg-stripe"></div>
+            <div class="mg-body">
+              <div class="mg-cat">{catLabels[post.cat]??post.cat}</div>
+              <h3 class="mg-title">{post.title}</h3>
+              <div class="mg-foot">
+                <span class="mg-date">{post.date}</span>
+                {post.rating&&<span class="mg-rating">{post.rating}/10</span>}
+              </div>
+              {post.tags.length>0&&<div class="mg-tags">{post.tags.map(t=><span class="mg-tag">#{t}</span>)}</div>}
+            </div>
+            <div class="mg-diamond" aria-hidden="true"></div>
+            <div class="mg-shine"   aria-hidden="true"></div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+</section>
+
+<!-- ══ MAGICAL TV — AD SECTION ══ -->
+<div class="section-lead"></div>
+<section id="blog-tv">
+  <div class="inner-wrap tv-wrap">
+
+    <!-- Left decorative panel -->
+    <div class="tv-side tv-side-l" aria-hidden="true">
+      <svg viewBox="0 0 160 400" fill="none" width="160" height="400">
+        <path d="M20 400 L20 120 Q80 10 140 120 L140 400" stroke="rgba(232,0,106,.32)" stroke-width="2" fill="rgba(232,0,106,.04)"/>
+        <path d="M30 400 L30 126 Q80 26 130 126 L130 400" stroke="rgba(240,200,74,.2)" stroke-width=".8" fill="none" stroke-dasharray="4 7"/>
+        <circle cx="80" cy="82"  r="28" fill="rgba(232,0,106,.16)" stroke="rgba(240,200,74,.44)" stroke-width="1.3"/>
+        <circle cx="50" cy="106" r="20" fill="rgba(140,0,180,.12)" stroke="rgba(240,200,74,.3)"  stroke-width="1"/>
+        <circle cx="110" cy="106" r="20" fill="rgba(232,0,106,.14)" stroke="rgba(240,200,74,.3)" stroke-width="1"/>
+        <!-- Heart -->
+        <path d="M80 96 C80 96 72 91 72 85 C72 81.5 74.5 80 77 80 C78.5 80 80 82 80 82 C80 82 81.5 80 83 80 C85.5 80 88 81.5 88 85 C88 91 80 96 80 96Z" fill="rgba(232,0,106,.85)"/>
+        <polygon points="80,118 106,140 80,162 54,140" fill="rgba(232,0,106,.13)" stroke="rgba(240,200,74,.38)" stroke-width="1.3"/>
+        <rect x="24" y="116" width="42" height="44" fill="rgba(232,0,106,.08)" stroke="rgba(240,200,74,.26)" stroke-width=".9"/>
+        <rect x="94" y="116" width="42" height="44" fill="rgba(140,0,180,.08)" stroke="rgba(240,200,74,.26)" stroke-width=".9"/>
+        <rect x="24" y="168" width="112" height="54" fill="rgba(240,200,74,.05)" stroke="rgba(240,200,74,.22)" stroke-width=".9"/>
+        <rect x="24" y="230" width="54" height="64" fill="rgba(232,0,106,.07)" stroke="rgba(240,200,74,.2)"  stroke-width=".9"/>
+        <rect x="82" y="230" width="54" height="64" fill="rgba(140,0,180,.07)" stroke="rgba(240,200,74,.2)"  stroke-width=".9"/>
+        <rect x="24" y="302" width="112" height="95" fill="rgba(232,0,106,.06)" stroke="rgba(240,200,74,.18)" stroke-width=".9"/>
+        <line x1="80" y1="116" x2="80" y2="398" stroke="rgba(240,200,74,.3)"  stroke-width="1.2"/>
+        <line x1="24" y1="166" x2="136" y2="166" stroke="rgba(240,200,74,.24)" stroke-width="1"/>
+        <line x1="24" y1="228" x2="136" y2="228" stroke="rgba(240,200,74,.2)"  stroke-width=".9"/>
+        <line x1="24" y1="300" x2="136" y2="300" stroke="rgba(240,200,74,.18)" stroke-width=".8"/>
+        <circle cx="20"  cy="400" r="6" fill="rgba(240,200,74,.45)"/>
+        <circle cx="140" cy="400" r="6" fill="rgba(240,200,74,.45)"/>
+      </svg>
+    </div>
+
+    <!-- CENTER: the TV -->
+    <div class="tv-center">
+      <div class="tv-heading">
+        <div class="sec-over"><div class="sec-rule"></div>support the blog<div class="sec-rule"></div></div>
+        <div class="sec-title">On Air</div>
+        <p class="tv-sub">Click the power button to tune in.</p>
+      </div>
+
+      <div class="tv-device-wrap" id="tv-device">
+        <div class="tv-device-glow"></div>
+        <svg class="tv-svg" viewBox="0 0 440 340" fill="none">
+          <defs>
+            <linearGradient id="tvb" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="#3a1445"/>
+              <stop offset="100%" stop-color="#1e0828"/>
+            </linearGradient>
+            <linearGradient id="tvg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="#fff2a0"/>
+              <stop offset="100%" stop-color="#906000"/>
+            </linearGradient>
+            <linearGradient id="tv-soff" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="#06000e"/>
+              <stop offset="100%" stop-color="#03000a"/>
+            </linearGradient>
+            <radialGradient id="tv-son" cx="50%" cy="42%" r="58%">
+              <stop offset="0%"   stop-color="#38006a"/>
+              <stop offset="45%"  stop-color="#22003a"/>
+              <stop offset="100%" stop-color="#0c0018"/>
+            </radialGradient>
+            <clipPath id="tv-screen-clip"><rect x="36" y="30" width="308" height="218" rx="10"/></clipPath>
+          </defs>
+
+          <!-- Legs -->
+          <rect x="136" y="310" width="20" height="28" rx="5" fill="rgba(42,14,52,.95)" stroke="rgba(240,200,74,.45)" stroke-width="1.5"/>
+          <rect x="284" y="310" width="20" height="28" rx="5" fill="rgba(42,14,52,.95)" stroke="rgba(240,200,74,.45)" stroke-width="1.5"/>
+          <rect x="122" y="332" width="52" height="7"  rx="3.5" fill="url(#tvg)" stroke="rgba(255,245,160,.45)" stroke-width="1"/>
+          <rect x="266" y="332" width="52" height="7"  rx="3.5" fill="url(#tvg)" stroke="rgba(255,245,160,.45)" stroke-width="1"/>
+
+          <!-- Body -->
+          <rect x="6" y="14" width="428" height="300" rx="22" fill="url(#tvb)"/>
+          <rect x="6" y="14" width="428" height="300" rx="22" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="1.2"/>
+          <rect x="6" y="14" width="428" height="300" rx="22" fill="none" stroke="url(#tvg)" stroke-width="3"/>
+          <!-- Left highlight edge -->
+          <path d="M6 36 Q6 14 28 14 L28 314 Q6 314 6 292 Z" fill="rgba(255,255,255,.06)"/>
+
+          <!-- Antennas -->
+          <rect x="116" y="2"  width="9"  height="38" rx="4.5" fill="rgba(255,200,235,.8)" stroke="rgba(255,160,210,.4)" stroke-width=".9"/>
+          <rect x="315" y="2"  width="9"  height="38" rx="4.5" fill="rgba(255,200,235,.8)" stroke="rgba(255,160,210,.4)" stroke-width=".9"/>
+          <rect x="113" y="36" width="15" height="7"  rx="3.5" fill="url(#tvg)"/>
+          <rect x="312" y="36" width="15" height="7"  rx="3.5" fill="url(#tvg)"/>
+          <!-- Antenna tip stars -->
+          <path d="M120.5 4 L122 9 L127 7.5 L124.5 12 L130 13 L125.5 16.5 L128 22 L123 20 L122.5 26 L120.5 21 L118.5 26 L118 20 L113 22 L115.5 16.5 L111 13 L116.5 12 L114 7.5 L119 9 Z" fill="rgba(240,200,74,.9)"/>
+          <path d="M320 4 L321.5 9 L326.5 7.5 L324 12 L329.5 13 L325 16.5 L327.5 22 L322.5 20 L322 26 L320 21 L318 26 L317.5 20 L312.5 22 L315 16.5 L310.5 13 L316 12 L313.5 7.5 L318.5 9 Z" fill="rgba(240,200,74,.9)"/>
+          <!-- Hearts in antenna stars -->
+          <path d="M120.5 17 C120.5 17 117.5 15 117.5 13 C117.5 12 118.3 11.4 119.2 11.4 C119.9 11.4 120.5 12.2 120.5 12.2 C120.5 12.2 121.1 11.4 121.8 11.4 C122.7 11.4 123.5 12 123.5 13 C123.5 15 120.5 17 120.5 17Z" fill="rgba(232,0,106,.9)"/>
+          <path d="M320 17 C320 17 317 15 317 13 C317 12 317.8 11.4 318.7 11.4 C319.4 11.4 320 12.2 320 12.2 C320 12.2 320.6 11.4 321.3 11.4 C322.2 11.4 323 12 323 13 C323 15 320 17 320 17Z" fill="rgba(232,0,106,.9)"/>
+
+          <!-- Screen bezel + screen -->
+          <rect x="28" y="22" width="324" height="234" rx="14" fill="rgba(4,0,12,.95)" stroke="url(#tvg)" stroke-width="2.5"/>
+          <rect class="tv-screen" x="36" y="30" width="308" height="218" rx="10" fill="url(#tv-soff)"/>
+          <!-- Glass reflection -->
+          <ellipse cx="156" cy="78" rx="72" ry="26" fill="rgba(255,255,255,.04)" transform="rotate(-8 156 78)" clip-path="url(#tv-screen-clip)"/>
+
+          <!-- ── SCREEN CONTENT (hidden when off) ── -->
+          <g class="tv-on-content" opacity="0">
+            <!-- Scanlines -->
+            <rect x="36" y="30" width="308" height="218" rx="10"
+              fill="url(#tv-son)" clip-path="url(#tv-screen-clip)"/>
+            <rect x="36" y="30" width="308" height="218" rx="10"
+              fill="none" clip-path="url(#tv-screen-clip)"
+              style="background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.12) 3px,rgba(0,0,0,.12) 4px)"/>
+            <!-- Status bar -->
+            <rect x="40" y="34" width="300" height="14" rx="4" fill="rgba(232,0,106,.14)" clip-path="url(#tv-screen-clip)"/>
+            <text x="50" y="44.5" font-family="monospace" font-size="8" fill="rgba(255,180,210,.72)" clip-path="url(#tv-screen-clip)">♡ MAGICAL TV — ON AIR ♡</text>
+            <circle class="tv-blink" cx="330" cy="41" r="4" fill="rgba(232,0,106,.85)" clip-path="url(#tv-screen-clip)"/>
+            <!-- Gothic arch on screen -->
+            <path d="M100 248 L100 158 Q190 78 280 158 L280 248" fill="rgba(232,0,106,.08)" stroke="rgba(232,0,106,.28)" stroke-width="1.5" clip-path="url(#tv-screen-clip)"/>
+            <path d="M110 248 L110 163 Q190 90 270 163 L270 248" stroke="rgba(240,200,74,.15)" stroke-width=".8" fill="none" stroke-dasharray="4 6" clip-path="url(#tv-screen-clip)"/>
+            <!-- Big glowing heart center screen -->
+            <path d="M190 220 C190 220 148 196 148 168 C148 154 157 147 166 147 C172 147 190 158 190 158 C190 158 208 147 214 147 C223 147 232 154 232 168 C232 196 190 220 190 220Z"
+              fill="rgba(255,255,255,.12)" clip-path="url(#tv-screen-clip)"/>
+            <path d="M190 215 C190 215 151.5 193 151.5 168 C151.5 156 159.5 150 166.5 150 C172.5 150 190 161.5 190 161.5 C190 161.5 207.5 150 213.5 150 C220.5 150 228.5 156 228.5 168 C228.5 193 190 215 190 215Z"
+              fill="rgba(232,0,106,.78)" stroke="rgba(255,160,210,.52)" stroke-width="1.5" clip-path="url(#tv-screen-clip)"/>
+            <path d="M159 154 C158 157 157.5 162 159 167" stroke="rgba(255,255,255,.62)" stroke-width="2.5" stroke-linecap="round" clip-path="url(#tv-screen-clip)"/>
+            <ellipse cx="166" cy="154" rx="12" ry="8" fill="rgba(255,255,255,.22)" transform="rotate(-25 166 154)" clip-path="url(#tv-screen-clip)"/>
+            <!-- Decorative stars -->
+            <path d="M90 160 L92 166 L98.5 167 L92 168 L90 174 L88 168 L81.5 167 L88 166 Z" fill="rgba(240,200,74,.88)" clip-path="url(#tv-screen-clip)"/>
+            <path d="M290 160 L292 166 L298.5 167 L292 168 L290 174 L288 168 L281.5 167 L288 166 Z" fill="rgba(240,200,74,.88)" clip-path="url(#tv-screen-clip)"/>
+            <!-- Little hearts -->
+            <path d="M70 185 C70 185 65 182 65 179 C65 177.5 66.2 177 67.5 177 C68.5 177 70 178.5 70 178.5 C70 178.5 71.5 177 72.5 177 C73.8 177 75 177.5 75 179 C75 182 70 185 70 185Z" fill="rgba(255,160,210,.72)" clip-path="url(#tv-screen-clip)"/>
+            <path d="M310 185 C310 185 305 182 305 179 C305 177.5 306.2 177 307.5 177 C308.5 177 310 178.5 310 178.5 C310 178.5 311.5 177 312.5 177 C313.8 177 315 177.5 315 179 C315 182 310 185 310 185Z" fill="rgba(255,160,210,.72)" clip-path="url(#tv-screen-clip)"/>
+            <!-- AD label -->
+            <text x="190" y="232" text-anchor="middle" font-family="monospace" font-size="8" fill="rgba(255,200,230,.55)" clip-path="url(#tv-screen-clip)">✦ your ad could appear here ✦</text>
+            <!-- Nav dots -->
+            <circle cx="176" cy="242" r="3.5" fill="rgba(232,0,106,.6)"   clip-path="url(#tv-screen-clip)"/>
+            <circle cx="190" cy="242" r="3.5" fill="rgba(255,255,255,.82)" clip-path="url(#tv-screen-clip)"/>
+            <circle cx="204" cy="242" r="3.5" fill="rgba(232,0,106,.4)"   clip-path="url(#tv-screen-clip)"/>
+          </g>
+
+          <!-- ── RIGHT CONTROL PANEL ── -->
+          <rect x="358" y="34" width="62" height="218" rx="12" fill="rgba(26,6,40,.65)"/>
+          <!-- Power button -->
+          <circle id="tv-power" class="tv-power-btn" cx="389" cy="72" r="18" fill="rgba(232,0,106,.18)" stroke="rgba(232,0,106,.55)" stroke-width="1.8"/>
+          <circle cx="389" cy="72" r="12" fill="rgba(22,4,36,.85)"/>
+          <path d="M389 62 L389 74 M382 64.5 C379 67 377 71 377 74 C377 80.5 382 86 389 86 C396 86 401 80.5 401 74 C401 71 399 67 396 64.5"
+            stroke="rgba(232,0,106,.85)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+          <!-- Volume knob -->
+          <circle cx="389" cy="122" r="14" fill="rgba(240,200,74,.15)" stroke="rgba(240,200,74,.48)" stroke-width="1.5"/>
+          <circle cx="389" cy="122" r="8"  fill="rgba(22,4,36,.85)"/>
+          <line x1="389" y1="114" x2="389" y2="118" stroke="rgba(240,200,74,.78)" stroke-width="2.2" stroke-linecap="round"/>
+          <!-- Channel up/down -->
+          <rect x="376" y="150" width="26" height="13" rx="6.5" fill="rgba(232,0,106,.35)" stroke="rgba(255,160,210,.42)" stroke-width="1"/>
+          <rect x="376" y="168" width="26" height="13" rx="6.5" fill="rgba(232,0,106,.35)" stroke="rgba(255,160,210,.42)" stroke-width="1"/>
+          <text x="389" y="159.5" text-anchor="middle" font-family="sans-serif" font-size="9" fill="rgba(255,200,230,.82)">▲</text>
+          <text x="389" y="177.5" text-anchor="middle" font-family="sans-serif" font-size="9" fill="rgba(255,200,230,.82)">▼</text>
+          <!-- Speaker grill -->
+          {[0,1,2,3,4,5].map(j => (
+            <rect x="370" y={194 + j*7} width="36" height="4" rx="2" fill="rgba(232,0,106,.22)"/>
+          ))}
+
+          <!-- ── BOTTOM BRAND BAR ── -->
+          <rect x="36" y="254" width="308" height="34" rx="8" fill="rgba(16,2,28,.75)"/>
+          <text x="190" y="275.5" text-anchor="middle" font-family="monospace" font-size="10" fill="rgba(232,0,106,.58)">♡ MAGICAL TV ♡</text>
+          <!-- Indicator dots -->
+          <circle class="tv-ind-1" cx="270" cy="271" r="4.5" fill="rgba(232,0,106,.4)"/>
+          <circle class="tv-ind-2" cx="284" cy="271" r="4.5" fill="rgba(240,200,74,.32)"/>
+          <circle class="tv-ind-3" cx="298" cy="271" r="4.5" fill="rgba(0,200,212,.25)"/>
+          <!-- Gold corner hearts -->
+          <path d="M24 22 C24 22 20 20 20 17.5 C20 16.2 21 15.5 22 15.5 C22.8 15.5 24 17 24 17 C24 17 25.2 15.5 26 15.5 C27 15.5 28 16.2 28 17.5 C28 20 24 22 24 22Z" fill="rgba(232,0,106,.55)"/>
+          <path d="M416 22 C416 22 412 20 412 17.5 C412 16.2 413 15.5 414 15.5 C414.8 15.5 416 17 416 17 C416 17 417.2 15.5 418 15.5 C419 15.5 420 16.2 420 17.5 C420 20 416 22 416 22Z" fill="rgba(232,0,106,.55)"/>
+        </svg>
+        <div class="tv-caption">Click ⏻ to watch</div>
+      </div>
+    </div>
+
+    <!-- Right panel mirror -->
+    <div class="tv-side tv-side-r" aria-hidden="true">
+      <svg viewBox="0 0 160 400" fill="none" width="160" height="400">
+        <path d="M140 400 L140 120 Q80 10 20 120 L20 400" stroke="rgba(140,0,180,.32)" stroke-width="2" fill="rgba(140,0,180,.04)"/>
+        <path d="M130 400 L130 126 Q80 26 30 126 L30 400" stroke="rgba(240,200,74,.2)" stroke-width=".8" fill="none" stroke-dasharray="4 7"/>
+        <circle cx="80" cy="82"  r="28" fill="rgba(140,0,180,.16)" stroke="rgba(240,200,74,.44)" stroke-width="1.3"/>
+        <circle cx="50" cy="106" r="20" fill="rgba(232,0,106,.12)" stroke="rgba(240,200,74,.3)"  stroke-width="1"/>
+        <circle cx="110" cy="106" r="20" fill="rgba(140,0,180,.14)" stroke="rgba(240,200,74,.3)" stroke-width="1"/>
+        <circle cx="80" cy="82" r="11" fill="rgba(200,140,255,.2)"/>
+        <polygon points="80,118 106,140 80,162 54,140" fill="rgba(140,0,180,.13)" stroke="rgba(240,200,74,.38)" stroke-width="1.3"/>
+        <rect x="24" y="116" width="42" height="44" fill="rgba(140,0,180,.08)" stroke="rgba(240,200,74,.26)" stroke-width=".9"/>
+        <rect x="94" y="116" width="42" height="44" fill="rgba(232,0,106,.08)" stroke="rgba(240,200,74,.26)" stroke-width=".9"/>
+        <rect x="24" y="168" width="112" height="54" fill="rgba(232,0,106,.06)" stroke="rgba(240,200,74,.22)" stroke-width=".9"/>
+        <rect x="24" y="230" width="54" height="64" fill="rgba(240,200,74,.05)" stroke="rgba(240,200,74,.2)"  stroke-width=".9"/>
+        <rect x="82" y="230" width="54" height="64" fill="rgba(140,0,180,.07)" stroke="rgba(240,200,74,.2)"  stroke-width=".9"/>
+        <rect x="24" y="302" width="112" height="95" fill="rgba(140,0,180,.06)" stroke="rgba(240,200,74,.18)" stroke-width=".9"/>
+        <line x1="80" y1="116" x2="80" y2="398" stroke="rgba(240,200,74,.3)"  stroke-width="1.2"/>
+        <line x1="24" y1="166" x2="136" y2="166" stroke="rgba(240,200,74,.24)" stroke-width="1"/>
+        <line x1="24" y1="228" x2="136" y2="228" stroke="rgba(240,200,74,.2)"  stroke-width=".9"/>
+        <line x1="24" y1="300" x2="136" y2="300" stroke="rgba(240,200,74,.18)" stroke-width=".8"/>
+        <circle cx="20"  cy="400" r="6" fill="rgba(240,200,74,.45)"/>
+        <circle cx="140" cy="400" r="6" fill="rgba(240,200,74,.45)"/>
+      </svg>
+    </div>
+
+  </div>
+</section>
+
+</Base>
+
+<style>
+/* ══ HERO ══ */
+#blog-hero{min-height:72vh;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 52px 56px}
+.bh-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 55% at 50% 45%,rgba(232,0,106,.18) 0%,transparent 62%),radial-gradient(ellipse 30% 35% at 12% 20%,rgba(140,0,180,.1) 0%,transparent 55%),linear-gradient(180deg,var(--dark) 0%,var(--dark2) 55%,var(--dark) 100%)}
+.bh-vignette{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,transparent 30%,rgba(0,0,0,.7) 100%);z-index:1}
+.bh-rose{position:absolute;z-index:2;top:50%;left:50%;transform:translate(-50%,-50%);width:min(80vmin,600px);height:min(80vmin,600px);pointer-events:none;animation:rbreath 6s ease-in-out infinite}
+@keyframes rbreath{0%,100%{opacity:.22}50%{opacity:.34}}
+.bh-arch{position:absolute;z-index:3;top:50%;left:50%;transform:translate(-50%,-50%);width:min(44vmin,380px);height:min(60vmin,520px);pointer-events:none}
+.bh-lh{position:absolute;left:0;right:0;height:2px;z-index:4;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(240,200,74,.28),rgba(232,0,106,.45),rgba(240,200,74,.28),transparent)}
+.bh-lv{position:absolute;top:0;bottom:0;width:2px;z-index:4;pointer-events:none;background:linear-gradient(180deg,transparent,rgba(232,0,106,.28),rgba(240,200,74,.32),rgba(232,0,106,.28),transparent)}
+.bh-inner{position:relative;z-index:10;text-align:center;display:flex;flex-direction:column;align-items:center}
+.bh-cross{margin-bottom:18px;filter:drop-shadow(0 0 12px rgba(232,0,106,.6));animation:cpulse 3.5s ease-in-out infinite}
+@keyframes cpulse{0%,100%{filter:drop-shadow(0 0 12px rgba(232,0,106,.5))}50%{filter:drop-shadow(0 0 28px rgba(255,68,153,.9))}}
+.bh-eyebrow{font-family:var(--font-heading);font-size:.46rem;letter-spacing:.52em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:12px;opacity:0;animation:fadeup .7s ease .1s forwards}
+.bhe-l{height:1px;width:36px;background:linear-gradient(90deg,transparent,var(--gold))}
+.bhe-r{height:1px;width:36px;background:linear-gradient(270deg,transparent,var(--gold))}
+@keyframes fadeup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.bh-title{font-family:var(--font-display);font-size:clamp(3rem,9vw,7.5rem);font-weight:300;font-style:italic;line-height:.92;margin-bottom:28px;background:linear-gradient(135deg,var(--mg5) 0%,var(--mg4) 22%,var(--mg3) 44%,var(--gold2) 62%,var(--mg3) 78%,var(--mg5) 100%);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer-t 5s ease-in-out infinite,titlereveal .9s cubic-bezier(.77,0,.175,1) .05s both}
+@keyframes shimmer-t{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes titlereveal{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.bh-filters{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;opacity:0;animation:fadeup .8s ease .4s forwards}
+.bhf{font-family:var(--font-heading);font-size:.44rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,240,248,.62);padding:8px 18px;text-decoration:none;transition:all .22s;border:1px solid transparent;position:relative}
+.bhf::after{content:'';position:absolute;bottom:0;left:10px;right:10px;height:1px;background:linear-gradient(90deg,var(--mg),var(--gold));transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.bhf:hover{color:var(--mg4)}.bhf:hover::after{transform:scaleX(1)}
+.bhf-active{color:var(--mg4);border-color:rgba(232,0,106,.28);background:rgba(232,0,106,.08)}.bhf-active::after{transform:scaleX(1)}
+.bh-scroll{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);z-index:10;display:flex;flex-direction:column;align-items:center;gap:5px;opacity:0;animation:fadeup .8s ease .8s forwards}
+.bh-scroll-l{width:1px;height:38px;background:linear-gradient(180deg,transparent,var(--mg2));animation:scg 2.3s ease-in-out infinite}
+@keyframes scg{0%{height:0;opacity:0}55%{height:38px;opacity:1}100%{height:38px;opacity:0}}
+.bh-scroll-t{font-family:var(--font-heading);font-size:.44rem;letter-spacing:.36em;text-transform:uppercase;color:rgba(232,0,106,.45)}
+
+/* floating deco removed */
+@keyframes fd-float{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-16px) rotate(3deg)}}
+.fd-sym{position:absolute;font-family:var(--font-display);font-size:1rem;color:var(--mg3);opacity:0;animation:fd-sym-anim var(--d,2s) ease-out infinite var(--dl,0s);left:var(--x,20px);top:var(--y,0px);pointer-events:none}
+@keyframes fd-sym-anim{0%{opacity:0;transform:scale(0) rotate(0deg)}35%{opacity:.9;transform:scale(1.2) rotate(20deg)}100%{opacity:0;transform:scale(.2) rotate(40deg) translateY(-16px)}}
+.fd-spark{border-radius:50%;animation:wspk var(--d,1.5s) ease-out infinite var(--dl,0s)}
+@keyframes wspk{0%{opacity:0;transform:translate(0,0) scale(0)}35%{opacity:1;transform:translate(var(--tx,4px),var(--ty,-8px)) scale(1.2)}100%{opacity:0;transform:translate(var(--tx2,8px),var(--ty2,-18px)) scale(.1)}}
+
+/* ══ INNER WRAP ══ */
+.inner-wrap{max-width:1200px;margin:0 auto;padding:72px 52px}
+
+/* ══ FEATURED ══ */
+#blog-featured{background:var(--dark2)}
+.feat-card{display:grid;grid-template-columns:1.1fr 4px 1fr;border:2px solid rgba(232,0,106,.2);text-decoration:none;overflow:hidden;transition:border-color .4s}
+.feat-card:hover{border-color:rgba(232,0,106,.65)}
+.feat-card:hover .feat-window{transform:scale(1.02) translateY(-6px);filter:drop-shadow(0 0 28px rgba(232,0,106,.4))}
+.feat-card:hover .feat-title{color:#fff;text-shadow:0 0 18px rgba(232,0,106,.35)}
+.feat-card:hover .feat-cta-l{width:50px}
+.feat-vis{background:linear-gradient(145deg,var(--dark3),var(--dark2));min-height:420px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.feat-vis-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 42% 48%,rgba(232,0,106,.22) 0%,transparent 55%)}
+.feat-window{width:min(300px,85%);height:auto;position:relative;z-index:2;transition:transform .5s,filter .5s;filter:drop-shadow(0 0 18px rgba(232,0,106,.25))}
+.feat-badge{position:absolute;top:20px;left:20px;z-index:6;font-family:var(--font-heading);font-size:.44rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(240,200,74,.38);background:rgba(26,8,32,.85);padding:4px 11px;backdrop-filter:blur(10px)}
+.feat-c-tl{position:absolute;top:14px;left:14px;width:20px;height:20px;border-top:1.5px solid rgba(240,200,74,.42);border-left:1.5px solid rgba(240,200,74,.42);z-index:5}
+.feat-c-br{position:absolute;bottom:14px;right:14px;width:20px;height:20px;border-bottom:1.5px solid rgba(240,200,74,.42);border-right:1.5px solid rgba(240,200,74,.42);z-index:5}
+.feat-div{background:var(--lead);border-left:1px solid rgba(240,200,74,.2);border-right:1px solid rgba(240,200,74,.2)}
+.feat-body{background:var(--dark4);padding:52px 44px;display:flex;flex-direction:column;justify-content:center;position:relative}
+.feat-body::before{content:'';position:absolute;left:0;top:10%;bottom:10%;width:1px;background:linear-gradient(180deg,transparent,rgba(232,0,106,.28),transparent)}
+.feat-cat{font-family:var(--font-heading);font-size:.44rem;letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.feat-spoiler{font-size:.42rem;background:rgba(232,0,106,.14);border:1px solid rgba(232,0,106,.32);padding:2px 7px;color:var(--mg3)}
+.feat-title{font-family:var(--font-display);font-size:clamp(1.7rem,2.5vw,2.2rem);font-weight:400;color:var(--mg5);line-height:1.18;margin-bottom:16px;transition:all .3s}
+.feat-desc{font-style:italic;font-size:.93rem;color:rgba(255,180,220,.82);line-height:1.9;margin-bottom:20px}
+.feat-meta{font-family:var(--font-heading);font-size:.44rem;letter-spacing:.12em;color:rgba(220,160,200,.68);margin-bottom:16px}
+.feat-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px}
+.feat-tag{font-family:var(--font-heading);font-size:.42rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(232,0,106,.72);border:1px solid rgba(232,0,106,.18);padding:2px 8px}
+.feat-cta{font-family:var(--font-heading);font-size:.44rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mg3);display:flex;align-items:center;gap:10px;transition:gap .3s}
+.feat-cta-l{width:26px;height:1px;background:linear-gradient(90deg,var(--mg),var(--gold));transition:width .3s}
+
+/* ══ MAGAZINE GRID ══ */
+#blog-grid{background:var(--dark3)}
+.mag-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  grid-auto-rows:200px;
+  gap:4px;
+  background:rgba(232,0,106,.07);
+  margin-top:44px;
+}
+/* 7 variants for visual rhythm */
+.mg-v1{grid-column:span 2;grid-row:span 2} /* large square */
+.mg-v2{grid-column:span 1;grid-row:span 1} /* small */
+.mg-v3{grid-column:span 1;grid-row:span 1} /* small */
+.mg-v4{grid-column:span 2;grid-row:span 1} /* wide */
+.mg-v5{grid-column:span 1;grid-row:span 1} /* small */
+.mg-v6{grid-column:span 1;grid-row:span 2} /* tall */
+.mg-v7{grid-column:span 2;grid-row:span 1} /* wide */
+
+.mg-card{
+  background:var(--dark4);position:relative;overflow:hidden;
+  display:flex;flex-direction:column;
+  text-decoration:none;cursor:pointer;
+  transition:background .26s;
+  border:1px solid rgba(232,0,106,.07);
+}
+.mg-sample{opacity:.72;cursor:default}
+.mg-card:not(.mg-sample):hover{background:rgba(55,14,65,.98)}
+.mg-card:not(.mg-sample):hover .mg-title{color:#fff}
+.mg-card:not(.mg-sample):hover .mg-arrow{opacity:1;transform:translateX(4px)}
+.mg-card:not(.mg-sample):hover .mg-diamond{opacity:1;transform:translate(-50%,-50%) scale(1.6)}
+.mg-card:not(.mg-sample):hover .mg-shine{left:120%}
+
+.mg-stripe{height:5px;flex-shrink:0;background:linear-gradient(90deg,var(--ac),color-mix(in srgb,var(--ac) 60%,#fff 40%),var(--ac))}
+.mg-body{padding:16px 18px;flex:1;display:flex;flex-direction:column;justify-content:center;min-width:0;position:relative;z-index:2}
+.mg-cat{font-family:var(--font-heading);font-size:.42rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ac);margin-bottom:8px;display:block}
+.mg-title{font-family:var(--font-display);font-size:1rem;color:var(--mg5);line-height:1.3;margin-bottom:8px;transition:color .25s;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+.mg-v1 .mg-title{font-size:1.35rem;-webkit-line-clamp:5;line-height:1.25}
+.mg-v6 .mg-title{-webkit-line-clamp:4}
+.mg-v4 .mg-title,.mg-v7 .mg-title{-webkit-line-clamp:2}
+.mg-desc{font-style:italic;font-size:.82rem;color:rgba(255,180,220,.72);line-height:1.68;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mg-foot{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.mg-date{font-family:var(--font-heading);font-size:.42rem;letter-spacing:.1em;color:rgba(220,160,200,.68)}
+.mg-rating{font-family:var(--font-heading);font-size:.42rem;letter-spacing:.08em;color:var(--gold);background:rgba(240,200,74,.1);border:1px solid rgba(240,200,74,.22);padding:1px 7px}
+.mg-tags{display:flex;gap:4px;flex-wrap:wrap}
+.mg-tag{font-family:var(--font-heading);font-size:.38rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(232,0,106,.65);border:1px solid rgba(232,0,106,.18);padding:1px 6px}
+.mg-diamond{position:absolute;top:18px;right:16px;width:9px;height:9px;clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);background:var(--ac);opacity:.28;transition:opacity .25s,transform .25s;transform:translate(0,0) scale(1)}
+.mg-shine{position:absolute;top:0;left:-100%;width:55%;height:100%;background:linear-gradient(90deg,transparent,rgba(232,0,106,.06),transparent);transition:left .55s;pointer-events:none}
+.mg-arrow{position:absolute;bottom:12px;right:12px;color:var(--mg);opacity:0;transition:all .25s}
+
+/* ══ TV AD SECTION ══ */
+#blog-tv{background:var(--dark2)}
+.tv-wrap{display:grid;grid-template-columns:180px 1fr 180px;align-items:center;gap:28px;padding-top:52px;padding-bottom:72px}
+.tv-side{opacity:.55;transition:opacity .3s;align-self:stretch;display:flex;align-items:center}
+.tv-side:hover{opacity:.8}
+.tv-side svg{width:100%;height:auto}
+.tv-center{display:flex;flex-direction:column;align-items:center;gap:28px}
+.tv-heading{text-align:center}
+.tv-sub{font-family:var(--font-display);font-style:italic;font-size:.92rem;color:rgba(255,180,220,.55);margin-top:8px}
+.tv-device-wrap{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;animation:tv-float 6s ease-in-out infinite;filter:drop-shadow(0 0 22px rgba(232,0,106,.55)) drop-shadow(0 0 50px rgba(232,0,106,.22))}
+@keyframes tv-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.tv-device-glow{position:absolute;width:500px;height:300px;border-radius:50%;background:radial-gradient(ellipse,rgba(232,0,106,.18) 0%,rgba(160,0,180,.1) 40%,transparent 70%);animation:tvglow 4s ease-in-out infinite;pointer-events:none;top:50%;left:50%;transform:translate(-50%,-50%)}
+@keyframes tvglow{0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}}
+.tv-svg{width:min(440px,100%);height:auto;position:relative;z-index:2}
+.tv-caption{font-family:var(--font-heading);font-size:.46rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(232,0,106,.45);text-align:center}
+
+/* TV animations */
+.tv-screen{transition:fill .45s}
+.tv-on-content{transition:opacity .65s}
+.tv-blink{animation:tv-blink 1.2s step-end infinite}
+@keyframes tv-blink{0%,100%{opacity:1}50%{opacity:0}}
+.tv-ind-1{animation:tv-ind 3s ease-in-out infinite}
+.tv-ind-2{animation:tv-ind 3s ease-in-out infinite .4s}
+.tv-ind-3{animation:tv-ind 3s ease-in-out infinite .8s}
+@keyframes tv-ind{0%,100%{opacity:.3}50%{opacity:.9}}
+.tv-power-btn{cursor:pointer;transition:filter .2s}
+.tv-power-btn:hover{filter:brightness(1.5)}
+
+/* ══ LIGHT MODE ══ */
+body.light #blog-featured{background:var(--dark2)}
+body.light .feat-vis{background:linear-gradient(145deg,#f2e4f8,#fce8f5)}
+body.light .feat-body{background:#ffffff}
+body.light .feat-title{color:#1a0828}
+body.light .feat-card:hover .feat-title{color:#000;text-shadow:none}
+body.light .feat-desc{color:rgba(60,10,80,.65)}
+body.light #blog-grid{background:var(--dark3)}
+body.light .mag-grid{background:rgba(200,100,180,.12)}
+body.light .mg-card{background:#ffffff;border-color:rgba(200,100,180,.1)}
+body.light .mg-card:not(.mg-sample):hover{background:#faf0ff}
+body.light .mg-title{color:#1a0828}
+body.light .mg-desc{color:rgba(60,10,80,.62)}
+body.light #blog-tv{background:var(--dark2)}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:1100px){
+  .inner-wrap{padding:52px 36px}
+}
+@media(max-width:1100px){
+  .inner-wrap{padding:52px 36px}
+}
+@media(max-width:860px){
+  .feat-card{grid-template-columns:1fr}
+  .feat-div{display:none}
+  .feat-vis{min-height:200px}
+  .feat-body{padding:28px 22px}
+  .feat-title{font-size:1.55rem}
+  .mag-grid{grid-template-columns:repeat(2,1fr);grid-auto-rows:155px}
+  .mg-v1{grid-column:span 2;grid-row:span 2}
+  .mg-v4,.mg-v7{grid-column:span 2;grid-row:span 1}
+  .mg-v6{grid-row:span 1}
+  .tv-wrap{grid-template-columns:1fr;padding-left:20px;padding-right:20px}
+  .tv-side{display:none}
+  .inner-wrap{padding:40px 20px}
+  #blog-hero{padding:80px 20px 48px}
+  .feat-wrap{padding:48px 20px}
+}
+@media(max-width:640px){
+  .mag-grid{grid-template-columns:1fr;grid-auto-rows:auto}
+  .mg-v1,.mg-v4,.mg-v6,.mg-v7{grid-column:span 1;grid-row:span 1}
+  .mg-card{min-height:130px}
+  .bhf{padding:6px 10px;font-size:.42rem}
+  .bh-filters{gap:2px}
+  .sec-title{font-size:clamp(1.6rem,6vw,2.4rem)}
+}
+@media(max-width:400px){
+  .bhf{padding:5px 8px;font-size:.4rem;letter-spacing:.1em}
+  .mag-grid{gap:3px}
+  .inner-wrap{padding:32px 14px}
+}
+</style>
+
+<script>
+/* Blog title animation */
+(function(){
+  const el=document.getElementById('blog-title-el');
+  if(!el)return;
+  'Blog'.split('').forEach((ch,i)=>{
+    const s=document.createElement('span');
+    s.style.cssText=`display:inline-block;opacity:0;transform:translateY(100%) rotate(8deg);animation:letter-fall .65s cubic-bezier(.34,1.56,.64,1) ${0.1+i*.1}s forwards`;
+    s.textContent=ch;
+    el.appendChild(s);
+  });
+})();
+
+/* TV power button */
+(function(){
+  const btn=document.getElementById('tv-power');
+  const screen=document.querySelector('.tv-screen') as SVGRectElement|null;
+  const content=document.querySelector('.tv-on-content') as SVGGElement|null;
+  if(!btn||!screen||!content)return;
+  let on=false;
+
+  function turnOn(){
+    on=true;
+    screen.style.fill='rgba(255,255,255,.4)';
+    setTimeout(()=>{
+      screen.style.fill='rgba(255,255,255,.06)';
+      setTimeout(()=>{
+        screen.setAttribute('fill','url(#tv-son)');
+        screen.style.fill='';
+        content.style.opacity='1';
+      },80);
+    },55);
+  }
+  function turnOff(){
+    on=false;
+    content.style.opacity='0';
+    screen.style.fill='rgba(255,255,255,.55)';
+    setTimeout(()=>{ screen.style.fill=''; screen.setAttribute('fill','url(#tv-soff)'); },120);
+  }
+
+  btn.addEventListener('click',()=>on?turnOff():turnOn());
+  // Auto turn on after 2.5s
+  setTimeout(turnOn, 2500);
+  // Random flicker
+  setInterval(()=>{
+    if(on&&Math.random()<.12){ turnOff(); setTimeout(turnOn, 350+Math.random()*500); }
+  },6000);
+})();
+</script>
