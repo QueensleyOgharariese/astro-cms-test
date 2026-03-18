@@ -1,9 +1,9 @@
 # Decap CMS — Little Confidants
 # Modalità Netlify (online)
 
-backend:
-  name: git-gateway
-  branch: main  # il ramo principale del tuo repo Netlify
+# backend:
+#   name: git-gateway
+#   branch: main
 
 media_folder: "public/images/uploads"
 public_folder: "/images/uploads"
